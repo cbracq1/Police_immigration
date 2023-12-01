@@ -2,23 +2,48 @@
 title: "Premières statistiques descriptives"
 author: "Bracq"
 date: "28/11/2023"
-output:   html_document:
-    df_print: paged
-  html_notebook: default
+output:
+  html_notebook: 
+    encoding: UTF-8
   pdf_document: default
+  html_document:
+    df_print: paged
+    encoding: UTF-8
 editor_options:
   markdown:
     wrap: 72
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r libraries, include = FALSE}
+library(haven)#si t'as pas les packages il faut faire install.packages("nom du package") dans la console
+library(tidyverse)
+library(dplyr)
+library(labelled)
+library(survey)
+```
+
 
 ```{r bases, include = FALSE}
 if (!exists("indiv")) {
-  indiv <- read_sas("chemin/indiv.sas7bdat",  catalog_file = "chemin/formats.sas7bcat")
+  indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
   indiv <- to_factor(indiv)}
 
 if (!exists("indiv_pd")) {
-  indiv_pd <- svydesign(ids = indiv$ident_fa, data = indiv, weights = indiv$poidsi)}# objet survey, pour prendre en compte les pondérations pour certaines fonctions
+  indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)}# objet survey, pour prendre en compte les pondérations pour certaines fonctions
 
 ```
+
+Les variables d'intérêt sont : i_cufpol, i_contri, i_controla, i_controlb
+
+
+
+```{r}
+
+```
+
 
