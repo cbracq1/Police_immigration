@@ -13,6 +13,12 @@ editor_options:
 
 
 ```{r bases, include = FALSE}
+if (!exists("indiv")) {
+  indiv <- read_sas("chemin/indiv.sas7bdat",  catalog_file = "chemin/formats.sas7bcat")
+  indiv <- to_factor(indiv)}
+
+if (!exists("indiv_pd")) {
+  indiv_pd <- svydesign(ids = indiv$ident_fa, data = indiv, weights = indiv$poidsi)}# objet survey, pour prendre en compte les pondérations pour certaines fonctions
 
 ```
 
