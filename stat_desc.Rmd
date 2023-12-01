@@ -14,6 +14,8 @@ editor_options:
     wrap: 72
 ---
 
+# Projet DSSS : Police et immigration{.tabset .tabset-fade}
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -25,6 +27,10 @@ library(tidyverse)
 library(dplyr)
 library(labelled)
 library(survey)
+library(arrow)
+library(ggplot2)
+library(questionr)
+library(srvyr)
 ```
 
 
@@ -38,12 +44,18 @@ if (!exists("indiv_pd")) {
 
 ```
 
-Les variables d'intérêt sont : i_cufpol, i_contri, i_controla, i_controlb
 
+## Confiance en la police
+La variable d'intérêt est i_cnfpol :
+Avez-vous confiance dans les institutions suivantes en France : la police
 
-
-```{r}
-
+```{r, echo = FALSE}
+svytable(~i_cnfpol + group1, indiv_pd)
 ```
+
+
+
+## Discriminations
+Les variables d'intérêt sont i_contri, i_controla, i_controlb.
 
 
