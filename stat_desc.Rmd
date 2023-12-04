@@ -35,7 +35,7 @@ library(questionr)
 
 ```{r bases, include = FALSE}
 if (!exists("indiv")) {
-  indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
+  indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")$# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
   indiv <- to_factor(indiv)}
 
 if (!exists("indiv_pd")) {
@@ -50,6 +50,10 @@ Avez-vous confiance dans les institutions suivantes en France : la police
 
 ```{r, echo = FALSE}
 svytable(~i_cnfpol + group1, indiv_pd)
+```
+```{r}
+ggsurvey(indiv_pd, aes(x = as.factor(group1), y = as.factor(i_cnfpol), fill = as.factor(i_cnfpol)))+
+  geom_bar(stat = "identity")
 ```
 
 
