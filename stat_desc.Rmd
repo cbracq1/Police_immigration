@@ -55,7 +55,7 @@ svytable(~i_cnfpol + group1, indiv_pd)
 ggsurvey(indiv_pd, aes(x = as.factor(group1), y = as.factor(i_cnfpol), fill = as.factor(i_cnfpol)))+
   geom_bar(stat = "identity")
 ```
-
+Paramètres à regarder : durée de séjour, discrimination, génération et origine (origine_tous_g2), relations dans le quartier, sécurité du quartier
 
 
 ## Discriminations
