@@ -1,6 +1,6 @@
 ---
 title: "Premières statistiques descriptives"
-author: "Bracq"
+author: "Bracq, Raymond"
 date: "28/11/2023"
 output:
   html_notebook: 
@@ -36,7 +36,7 @@ library(questionr)
 
 ```{r bases, include = FALSE}
 if (!exists("indiv")) {
-  indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")$# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
+  indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
   indiv <- to_factor(indiv)}
 
 if (!exists("indiv_pd")) {
@@ -45,7 +45,12 @@ if (!exists("indiv_pd")) {
 ```
 
 ## Recodage
-group1, i_cnfpol, durée de séjour, génération et origine (origine_tous_g2), relations dans le quartier, sécurité du quartier, i_contri, i_controla, i_controlb, âge (agenq), sexe (sexee), QPV, indicateurs niveau socioéco, i_opipol
+
+ok: 
+i_cnfpol, i_cnfjus, i_ecole, i_contri
+
+à faire :
+group1, durée de séjour, génération et origine (origine_tous_g2), relations dans le quartier, sécurité du quartier, i_controla, i_controlb, âge (agenq), sexe (sexee), QPV, indicateurs niveau socioéco, i_opipol
 
 
 ```{r}
