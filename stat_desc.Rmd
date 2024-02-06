@@ -45,10 +45,46 @@ if (!exists("indiv_pd")) {
 ```
 
 ## Recodage
-i_cnfpol, durée de séjour, génération et origine (origine_tous_g2), relations dans le quartier, sécurité du quartier, i_contri, i_controla, i_controlb, âge (agenq), sexe (sexee), QPV, indicateurs niveau socioéco
+group1, i_cnfpol, durée de séjour, génération et origine (origine_tous_g2), relations dans le quartier, sécurité du quartier, i_contri, i_controla, i_controlb, âge (agenq), sexe (sexee), QPV, indicateurs niveau socioéco, i_opipol
 
 
 ```{r}
+
+
+## Recodage de indiv$i_cnfpol en indiv$i_cnfpol_rec
+indiv$i_cnfpol_rec <- as.character(indiv$i_cnfpol)
+indiv$i_cnfpol_rec <- fct_recode(indiv$i_cnfpol_rec,
+  "Tout à fait confiance en la police" = "1",
+  "Plutôt confiance en la police" = "2",
+  "Plutôt pas confiance en la police" = "3",
+  "Pas du tout confiance" = "4",
+  "Refus ou ne sait pas" = "8",
+  "Refus ou ne sait pas" = "9"
+)
+
+## Recodage de indiv$i_ecole en indiv$i_ecole_rec
+indiv$i_ecole_rec <- as.character(indiv$i_ecole)
+indiv$i_ecole_rec <- fct_recode(indiv$i_ecole_rec,
+  "Tout à fait confiance en l'école" = "1",
+  "Plutôt confiance en l'école" = "2",
+  "Plutôt pas confiance en l'école" = "3",
+  "Pas du tout confiance en l'école" = "4",
+  "Refus ou ne sait pas" = "8",
+  "Refus ou ne sait pas" = "9"
+)
+
+## Recodage de indiv$i_cnfjus en indiv$i_cnfjus_rec
+indiv$i_cnfjus_rec <- as.character(indiv$i_cnfjus)
+indiv$i_cnfjus_rec <- fct_recode(indiv$i_cnfjus_rec,
+  "Tout à fait confiance en la justice" = "1",
+  "Plutôt confiance en la justice" = "2",
+  "Plutôt pas confiance en la justice" = "3",
+  "Pas du tout confiance en la justice" = "4",
+  "Refus ou ne sait pas" = "8",
+  "Refus ou ne sait pas" = "9"
+)
+
+
 
 ```
 
