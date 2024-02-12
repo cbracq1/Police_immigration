@@ -47,11 +47,15 @@ if (!exists("indiv_pd")) {
 ## Recodage
 
 ok: 
-i_cnfpol, i_cnfjus, i_ecole, i_contri
+i_cnfpol, i_cnfjus, i_ecole, i_contri, génération et origine (origine_tous_g2), sexe (sexee), group1, sécurité du quartier(l_quart_secu),QPV (qpv_i), présence d'immigrés dans le quartier (l_immi)
 
 à faire :
-group1, durée de séjour, génération et origine (origine_tous_g2), relations dans le quartier, sécurité du quartier, i_controla, i_controlb, âge (agenq), sexe (sexee), QPV, indicateurs niveau socioéco, i_opipol
+relations dans le quartier, indicateurs niveau socioéco
 
+plus complexe (ou pas) :
+i_controla [modalité], i_controlb[modalité]
+durée de séjour [chiffre], âge (agenq) [chiffre]
+i_opipol[non-diffusé]
 
 ```{r}
 
@@ -98,6 +102,88 @@ indiv$i_contri_rec <- fct_recode(indiv$i_contri_rec,
   "Plus de 5 fois" = "4",
   "Refus ou ne sait pas" = "8",
   "Refus ou ne sait pas" = "9"
+)
+
+## Recodage de indiv$sexee en indiv$sexee_rec
+indiv$sexee_rec <- as.character(indiv$sexee)
+indiv$sexee_rec <- fct_recode(indiv$sexee_rec,
+  "Masculin" = "1",
+  "Féminin" = "2"
+)
+
+## Recodage de indiv$group1 en indiv$group1_rec
+indiv$group1_rec <- as.character(indiv$group1)
+indiv$group1_rec <- fct_recode(indiv$group1_rec,
+  "Immigré (né à l'étranger)" = "1",
+  "Originaire de l'Outre-mer" = "2",
+  "Descendant G2 d'un ou deux immigré(s)" = "3",
+  "Descendant G2 d'un ou deux originaire(s) d'outre-mer" = "4",
+  "Autres populations" = "5"
+)
+
+## Recodage de indiv$l_quart_secu en indiv$l_quart_secu_rec
+indiv$l_quart_secu_rec <- as.character(indiv$l_quart_secu)
+indiv$l_quart_secu_rec <- fct_recode(indiv$l_quart_secu_rec,
+  "Bonne" = "1",
+  "Moyenne" = "2",
+  "Mauvaise" = "3",
+  "Refus ou ne sait pa" = "8",
+  "Refus ou ne sait pa" = "9"
+)
+
+## Recodage de indiv$qpv_i en indiv$qpv_i_rec
+indiv$qpv_i_rec <- as.character(indiv$qpv_i)
+indiv$qpv_i_rec <- fct_recode(indiv$qpv_i_rec,
+  "Oui" = "1",
+  "Non" = "0"
+)
+
+## Recodage de indiv$l_immi en indiv$l_immi_rec
+indiv$l_immi_rec <- as.character(indiv$l_immi)
+indiv$l_immi_rec <- fct_recode(indiv$l_immi_rec,
+  "Presque tous sont d'origine immigrée" = "1",
+  "Plus de la moitié est d'origine immigrée" = "2",
+  "La moitié est d'origine immigrée" = "3",
+  "Moins de la moitié est d'origine immigrée" = "4",
+  "Refus ou ne sait pas" = "8",
+  "Refus ou ne sait pas" = "9"
+)
+
+## Recodage de indiv$origine_tous_g2 en indiv$origine_tous_g2_rec
+indiv$origine_tous_g2_rec <- as.character(indiv$origine_tous_g2)
+indiv$origine_tous_g2_rec <- fct_recode(indiv$origine_tous_g2_rec,
+  "Sans ascendance direct" = "0",
+  "Autres français né hors de France métro" = "10",
+  "Descendants de français né hors de France métro" = "11",
+  "Originaires d'Outre-mer" = "20",
+  "Descendants d'originaire(s) d'Outre-mer" = "22",
+  "Immigrés d'Algérie" = "30",
+  "Descendants d'immigrés(s) originaires d'Algérie" = "33",
+  "Immigrés du Maroc/Tunisie" = "40",
+  "Descendants d'immigré(s) originaires du Maroc/Tunisie" = "44",
+  "Immigrés d'Afrique sahélienne" = "50",
+  "Descendants d'immigré(s) originaires d'Afrique sahélienne" = "55",
+  "Immigrés d'Afrique guinéenne/centrale" = "60",
+  "Descendants d'immigré(s) originaires d'Afrique guinéenne/centrale" = "66",
+  "Immigrés d'autres pays d'Afrique" = "70",
+  "Descendants d'immigré(s) originaires d'autres pays d'Afrique" = "77",
+  "Immigrés d'Asie du Sud-est" = "80",
+  "Descendants d'immigré(s) originaires d'Asie du Sud-est" = "88",
+  "Immigrés de Trurquie/Moyen-Orient" = "90",
+  "Descendants d'immigré(s) originaires de Turquie/Moyen-Orient" = "99",
+  "Immigrés de Chine" = "100",
+  "Immigrés d'autres pays d'Asie" = "110",
+  "Descendants d'immigré(s) originaires d'autres pays d'Asie" = "111",
+  "Immigrés du Portugal" = "120",
+  "Descendants d'immigré(s) originaires du Portugal" = "121",
+  "Immigrés d'Espagne/Italie" = "130",
+  "Descendants d'immigré(s) originaires d'Espagne/Italie" = "131",
+  "Immigrés d'autres pays de l'UE27" = "140",
+  "Descendants d'immigré(s) originaires d'autres pays de l'UE27" = "141",
+  "Immigrés d'autres pays d'Europe" = "150",
+  "Descendants d'immigré(s) originaires d'autres pays d'Europe" = "151",
+  "Immigrés d'autres pays" = "160",
+  "Descendants d'immigré(s) originaires d'autres pays" = "161"
 )
 
 ```
