@@ -66,6 +66,22 @@ soit on veut créer une variable par modalité
 
 ```{r}
 
+## Recodage de indiv$csnq_ego en indiv$csnq_ego_rec
+indiv$csnq_ego_rec <- as.character(indiv$csnq_ego)
+indiv$csnq_ego_rec <- fct_recode(indiv$csnq_ego_rec,
+  "Jamais travaillé ou hors champ" = "0",
+  "Agriculteur" = "10",
+  "Artisan / Commerçant" = "20",
+  "Cadre / profession libérale" = "30",
+ "Profession intermédiaire" = "40",
+  "Employé qualifié" = "50",
+  "Employé non qualifié" = "51",
+  "Ouvrier qualifié" = "60",
+  "Ouvrier non qualifié" = "61",
+  "Refus ou ne sait pas ou incodable" = "90"
+)
+
+
 ## Recodage de indiv$f_dip en indiv$f_dip_rec
 indiv$f_dip_rec <- as.character(indiv$f_dip)
 indiv$f_dip_rec <- fct_recode(indiv$f_dip_rec,
