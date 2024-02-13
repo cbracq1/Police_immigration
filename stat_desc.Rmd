@@ -47,18 +47,51 @@ if (!exists("indiv_pd")) {
 ## Recodage
 
 ok: 
-i_cnfpol, i_cnfjus, i_ecole, i_contri, génération et origine (origine_tous_g2), sexe (sexee), group1, sécurité du quartier(l_quart_secu),QPV (qpv_i), présence d'immigrés dans le quartier (l_immi)
+i_cnfpol, i_cnfjus, i_ecole, i_contri, génération et origine (origine_tous_g2), sexe (sexee), group1, sécurité du quartier(l_quart_secu),QPV (qpv_i), présence d'immigrés dans le quartier (l_immi), relations dans le quartier (a_rquart), f_dip plus haut diplôme
 
 à faire :
-relations dans le quartier, indicateurs niveau socioéco
+, indicateurs niveau socioéco (csnq_ego, csnq_premp premier emploi, uc_reve : Montant mensuel des ressources du ménage par unité de consommation en euros, )
 
 plus complexe (ou pas) :
 i_controla [modalité], i_controlb[modalité]
 durée de séjour [chiffre], âge (agenq) [chiffre]
 i_opipol[non-diffusé]
 
+Variables chiffrées : on peut les laisser comme ça, et selon les traitements créer des catégories après avoir checké la distribution
+
+Modalité : 
+soit on veut créer une variable synthétique (genre toutes les personnes qui ont dit oui à au moins un truc négatif ou qui ont au moins pas coché un truc positif)
+soit on veut créer une variable par modalité
+
+
 ```{r}
 
+## Recodage de indiv$f_dip en indiv$f_dip_rec
+indiv$f_dip_rec <- as.character(indiv$f_dip)
+indiv$f_dip_rec <- fct_recode(indiv$f_dip_rec,
+  "Aucun diplôme" = "1",
+  "CEP (certificat d'études primaires) ou diplôme étranger de même niveau" = "2",
+  "Brevet des collèges, BEPC, brevet élémentaire ou diplôme étranger de même niveau" = "3",
+  "CAP, BEP ou diplôme de même niveau" = "4",
+  "Baccalauréat technologique ou professionnel ou diplôme de même niveau" = "5",
+  "Baccalauréat général, brevet supérieur, capacité en droit, DAEU ou diplôme étranger de même niveau" = "6",
+  "Diplôme de niveau BAC +1 ou +2" = "7",
+  "Diplôme de niveau supérieur à BAC + 2" = "8",
+)
+  
+  
+  
+## Recodage de indiv$a_rquart en indiv$a_rquart_rec
+indiv$a_rquart_rec <- as.character(indiv$a_rquart)
+indiv$a_rquart_rec <- fct_recode(indiv$a_rquart_rec,
+  "Presque tous" = "1",
+  "Plus de la moitié" = "2",
+  "La moitié" = "3",
+  "Moins de la moitié" = "4",
+  "Presque aucun ou aucun" = "5",
+  "Refus ou ne sait pas" = "8",
+  "Refus ou ne sait pas" = "9"
+)
 
 ## Recodage de indiv$i_cnfpol en indiv$i_cnfpol_rec
 indiv$i_cnfpol_rec <- as.character(indiv$i_cnfpol)
