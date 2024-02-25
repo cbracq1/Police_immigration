@@ -43,15 +43,270 @@ La variable d'intérêt est i_cnfpol :
 Avez-vous confiance dans les institutions suivantes en France : la police
 
 ```{r, echo = FALSE}
-svytable(~i_cnfpol_rec + group1_rec, indiv_pd)
+stable <- svytable(~i_cnfpol_rec + group1_code, indiv_pd)
 ```
+
 ```{r}
-ggsurvey(indiv_pd, aes(x = as.factor(group1_rec), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
+indiv$group1_code <- as.character(indiv$group1)
+indiv$group1_code <- fct_recode(indiv$group1_code,
+                               "G1-I" = "1",
+                               "G1-OM" = "2",
+                               "G2-I" = "3",
+                               "G2-OM" = "4",
+                               "Autre" = "5"
+)
+
+indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
+
+
+
+ggsurvey(indiv_pd, aes(x = as.factor(group1_code), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+#ggsurvey(indiv_pd, aes(x = as.factor(group1_rec), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
+#  geom_bar(stat = "identity")
+
+
+
+
+```
+Graphique relatif de la confiance envers la police :
+
+```{r}
+#Si il faut faire une repondération :
+dimension = dim(indiv_pd)
+
+nouv_pond = rep(0,dimension[1])
+
+for (g in c("G1-I","G2-I","G1-OM","G2-OM","Autre")){
+  liste = which(indiv_pd$variables$group1_code == g)
+  n_liste = length(liste)
+  nouv_pond[liste] = 1/n_liste
+  
+}
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = nouv_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_cnfpol_rec)))+
   geom_bar(stat = "identity")
 ```
-Paramètres à regarder : durée de séjour, génération et origine (origine_tous_g2), relations dans le quartier, sécurité du quartier
 
 
+La durée de séjour dans le pays de résidence a-t-elle une influence sur la confiance envers la police ?
+
+```{r}
+
+coloration = c("red","orange","purple","blue","green")
+group_un = c("G1-I","G2-I","G1-OM","G2-OM","Autre")
+
+for (i in 1:5){ #Pour chaque groupe : traçons une courbe confiance envers la police ~ durée de sejour
+  
+  g = group_un[i]
+  
+  #durée de sejour depuis la première arrivée : $durtotfrm
+  #durée de sejour depuis la dernière arrivée : $durar2
+  
+  data = indiv_pd2[which(indiv_pd2$variables$group1_code == g)]
+  
+  X = 0:100
+  Y = c()
+  for (x in X){
+    n_tot = length(which(data$variables$durar2==x))
+    n_obj = length(which(data$variables$durar2==x & data$variables$i_cnfpol_rec == "Tout à fait confiance en la police")) #Avoir confiance = Tout à fait confiance
+    Y = c(Y,n_obj/n_tot)
+  }
+  
+  plot(X,Y,type="l", xlim = c(0,70), ylim = c(0,1),col=coloration[i])
+  par(new=T)
+}
+```
+
+Ici nous remarquons pour les immigrés, une tendance à avoir de moins en moins confiance en la police selon la durée de séjour : ceci viendrait confirmer notre hypothèse. 
+
+
+Et en travaillant à âge égal ?
+
+```{r}
+
+coloration = c("red","orange","yellow","green","blue","purple")
+
+l_age_inf = c(0,20,30,40,50,60)
+l_age_sup = c(19,29,39,49,59,100)
+
+for (i in 1:6){ #Pour chaque groupe : traçons une courbe confiance envers la police ~ durée de sejour
+  
+  age_inf = l_age_inf[i]
+  age_sup = l_age_sup[i]
+  
+  g = group_un[1]
+  
+  #durée de sejour depuis la première arrivée : $durtotfrm
+  #durée de sejour depuis la dernière arrivée : $durar2
+  
+  data = indiv_pd2[which(indiv_pd2$variables$group1_code == g & indiv_pd2$variables$agenq >= age_inf & indiv_pd2$variables$agenq <= age_sup)]
+  
+  X = 0:100
+  Y = c()
+  for (x in X){
+    n_tot = length(which(data$variables$durar2==x))
+    n_obj = length(which(data$variables$durar2==x & data$variables$i_cnfpol_rec == "Tout à fait confiance en la police")) #Avoir confiance = Tout à fait confiance
+    Y = c(Y,n_obj/n_tot)
+  }
+  
+  plot(X,Y,type="l", xlim = c(0,70), ylim = c(0,1),col=coloration[i])
+  legend(50,1,legend=c("< 20 ans","> 20 et < 30 ans","> 30 et < 40 ans","> 40 et < 50 ans","> 50 et < 60 ans","> 60 ans"),col=c("red","orange","yellow","green","blue","purple"),lty=c(1,1,1,1,1,1),cex=0.8)  
+  par(new=T)
+}
+
+
+```
+
+Cette diminution de la confiance envers la police persévère ! (malgré une légère remontée pour les cinquantenaires arrivé très jeune en France)
+
+Nous continuons de confirmer notre hypothèse.
+
+
+Regardons la présence d'immigrés dans le quartier : pas d'effet clair non plus
+
+```{r}
+#présence d'immigrés dans le quartier (l_immi)
+indiv$l_immi
+indiv$l_immi_rec
+
+## Recodage de indiv$l_immi en indiv$l_immi_rec
+indiv$l_immi_code <- as.character(indiv$l_immi)
+indiv$l_immi_code <- fct_recode(indiv$l_immi_code,
+                               "Tous" = "1",
+                               "sup 50%" = "2",
+                               "eq 50%" = "3",
+                               "inf 50%" = "4",
+                               "Aucun" = "5",
+                               "null" = "8",
+                               "null" = "9")
+
+indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
+
+
+ggsurvey(indiv_pd, aes(x = as.factor(l_immi_code), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+
+immi_pond = pondation(indiv$l_immi_code)
+
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = immi_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(l_immi_code), y = immi_pond, fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+
+```
+
+
+Et concernant les relations avec le quartiers : une légère corrélation entre l'amitié et la confiance
+
+
+```{r}
+#relations dans le quartier (a_rquart) (avec combien de personnes de ton quartier, es-tu ami ?)
+
+indiv$a_rquart_rec
+
+## Recodage de indiv$l_immi en indiv$l_immi_rec
+indiv$a_rquart_code <- as.character(indiv$a_rquart)
+indiv$a_rquart_code <- fct_recode(indiv$a_rquart_code,
+                               "Tous" = "1",
+                               "sup 50%" = "2",
+                               "eq 50%" = "3",
+                               "inf 50%" = "4",
+                               "Aucun" = "5",
+                               "null" = "8",
+                               "null" = "9")
+
+
+indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
+
+
+ggsurvey(indiv_pd, aes(x = as.factor(a_rquart_code), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+
+rquart_pond = pondation(indiv$a_rquart_code)
+
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = rquart_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(a_rquart_code), y = rquart_pond, fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+```
+
+
+Concernant la sécu : se sentir en sécurité favorise la confiance
+
+```{r}
+#sécurité du quartier(l_quart_secu)
+#relations dans le quartier (a_rquart) (avec combien de personnes de ton quartier, es-tu ami ?)
+
+indiv$l_quart_secu_rec
+
+indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
+
+
+ggsurvey(indiv_pd, aes(x = as.factor(l_quart_secu_rec), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+
+secu_pond = pondation(indiv$l_quart_secu_rec)
+
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = secu_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(l_quart_secu_rec), y = secu_pond, fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+
+
+```
+
+
+
+Concernant le fait de vivre dans une QPV : il n'apparait pas clair que cette variable ait un impact sur le niveau de confiance envers la police des personnes immigrés.
+
+```{r}
+
+#Vivre dans un QPV (qpv_i)
+
+group_qpv = rep("null",dimension[1])
+qpv_pond = rep(0,dimension[1])
+
+group_qpv[which(indiv$qpv_i == 0 & indiv$group1_code=="G1-I")] = "G1-I out QPV"
+group_qpv[which(indiv$qpv_i == 1 & indiv$group1_code=="G1-I")] = "G1-I in QPV"
+group_qpv[which(indiv$qpv_i == 0 & indiv$group1_code=="Autre")] = "Autre out QPV"
+group_qpv[which(indiv$qpv_i == 1 & indiv$group1_code=="Autre")] = "Autre in QPV"
+
+qpv_pond[which(indiv$qpv_i == 0 & indiv$group1_code=="G1-I")] = 1/length(which(indiv$qpv_i == 0 & indiv$group1_code=="G1-I"))
+qpv_pond[which(indiv$qpv_i == 1 & indiv$group1_code=="G1-I")] = 1/length(which(indiv$qpv_i == 1 & indiv$group1_code=="G1-I"))
+qpv_pond[which(indiv$qpv_i == 0 & indiv$group1_code=="Autre")] = 1/length(which(indiv$qpv_i == 0 & indiv$group1_code=="Autre"))
+qpv_pond[which(indiv$qpv_i == 1 & indiv$group1_code=="Autre")] = 1/length(which(indiv$qpv_i == 1 & indiv$group1_code=="Autre"))
+
+
+indiv["group_QPV"] = group_qpv
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = qpv_pond)
+
+
+ggsurvey(indiv_pd, aes(x = as.factor(group_QPV), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+ggsurvey(indiv_pd2[which(indiv["group_QPV"]!="null")], aes(x = as.factor(group_QPV), y = qpv_pond[which(indiv["group_QPV"]!="null")], fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
+
+
+```
+
+
+Paramètres à regarder :  génération et origine (origine_tous_g2)
 
 ## Discriminations
 Les variables d'intérêt sont i_contri, i_controla, i_controlb.
