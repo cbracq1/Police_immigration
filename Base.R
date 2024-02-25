@@ -1,21 +1,20 @@
 # Base et recodage
 
 if (!exists("indiv")) {
-  indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
-  #indiv <- read_sas("C:/Users/3e3gr/OneDrive/Documents/ENSAE/3A-S2/PDSSS2/database en sas/TeO2/SAS/indiv.sas7bdat")
+  #indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
+  indiv <- read_sas("C:/Users/3e3gr/OneDrive/Documents/ENSAE/3A-S2/PDSSS2/database en sas/TeO2/SAS/indiv.sas7bdat")
   
-  indiv <- to_factor(indiv)}
+  indiv <- to_factor(indiv)
+  }
 
 # ## Recodage
 # 
 # ok: 
 #   i_cnfpol, i_cnfjus, i_ecole, i_contri, génération et origine (origine_tous_g2), 
 # sexe (sexee), group1, sécurité du quartier(l_quart_secu),QPV (qpv_i), 
-# présence d'immigrés dans le quartier (l_immi), relations dans le quartier (a_rquart), 
+# présence d'immigrés dans le quartier (l_immi), relations dans le quartier (a_rquart), sécurité du quartier(l_quart_secu),QPV (qpv_i)
 # f_dip plus haut diplôme, niveau socioéco (csnq_ego, csnq_premp premier emploi, uc_reve : Montant mensuel des ressources du ménage par unité de consommation en euros),
 # durée de séjour [chiffre], âge (agenq) [chiffre])
-# 
-# à faire :
 # 
 # 
 # plus complexe (ou pas) :
@@ -175,6 +174,7 @@ indiv$l_immi_rec <- fct_recode(indiv$l_immi_rec,
                                "Plus de la moitie est d'origine immigree" = "2",
                                "La moitie est d'origine immigree" = "3",
                                "Moins de la moitie est d'origine immigree" = "4",
+                               "Presque pas ou aucun n'est d'origine immigree" = "5",
                                "Refus ou ne sait pas" = "8",
                                "Refus ou ne sait pas" = "9"
 )
@@ -218,3 +218,16 @@ indiv$origine_tous_g2_rec <- fct_recode(indiv$origine_tous_g2_rec,
 
 
 indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
+
+
+pondation = function(var,size=dimension[1]){
+  labels = unique(var)
+  p = rep(0,size)
+  
+  for (l in labels){
+    index = which(var==l)
+    p[index] = 1/length(index)
+  }
+  
+  return(p)
+}
