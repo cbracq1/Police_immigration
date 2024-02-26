@@ -217,15 +217,59 @@ indiv$origine_tous_g2_rec <- fct_recode(indiv$origine_tous_g2_rec,
 )
 
 
+#Faisons de i_controla et i_controlb une seule est même variable :
+
+## A : Ils vous ont expliqué ce qu'ils faisaient et pourquoi
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_a == 1 | indiv$i_controlb_d == 1)] = 1
+indiv["i_control_rec_a"] = res
+
+## B : Ils ont été polis
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_f == 1 | indiv$i_controlb_b == 1)] = 1
+indiv["i_control_rec_b"] = res
+
+## C : Ils vous ont tutoyé
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_c == 1 | indiv$i_controlb_a == 1)] = 1
+indiv["i_control_rec_c"] = res
+
+## D : Ils ont fouillé vos vêtements et vos sacs
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_b == 1 | indiv$i_controlb_c == 1)] = 1
+indiv["i_control_rec_d"] = res
+
+## E : Ils vous ont provoqué, insulté
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_d == 1 | indiv$i_controlb_e == 1)] = 1
+indiv["i_control_rec_e"] = res
+
+## F : Ils ont été brutaux
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_e == 1 | indiv$i_controlb_f == 1)] = 1
+indiv["i_control_rec_f"] = res
+
+## G : Rien de tout cela
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_g == 1 | indiv$i_controlb_g == 1)] = 1
+indiv["i_control_rec_g"] = res
+
+## H : Refus ou ne sait pas
+res = rep(0,dimension[1])
+res[which(indiv$i_controla_flag == 1 | indiv$i_controlb_flag == 1)] = 1
+indiv["i_control_rec_flag"] = res
+
+
+
 indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
 
-pondation = function(var,size=dimension[1]){
+pondation = function(var,var_contrainte,contrainte,size=dimension[1]){
   labels = unique(var)
   p = rep(0,size)
   
   for (l in labels){
-    index = which(var==l)
+    index = which(var==l & var_contrainte != contrainte)
     p[index] = 1/length(index)
   }
   
