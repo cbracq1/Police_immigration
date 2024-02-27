@@ -1,22 +1,22 @@
 ---
-title: "Premières statistiques descriptives"
+  title: "Premières statistiques descriptives"
 author: "Bracq, Raymond"
 date: "28/11/2023"
 output:
   html_notebook: 
-    encoding: UTF-8
-  pdf_document: default
-  html_document:
-    df_print: paged
-    encoding: UTF-8
+  encoding: UTF-8
+pdf_document: default
+html_document:
+  df_print: paged
+encoding: UTF-8
 editor_options:
   markdown:
-    wrap: 72
+  wrap: 72
 ---
-
-# Projet DSSS : Police et immigration{.tabset .tabset-fade}
-
-```{r setup, include=FALSE}
+  
+  # Projet DSSS : Police et immigration{.tabset .tabset-fade}
+  
+  ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -76,12 +76,19 @@ Graphique relatif de la confiance envers la police :
 #Si il faut faire une repondération :
 dimension = dim(indiv_pd)
 
+nouv_pond = rep(0,dimension[1])
 
-tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+group1_code, indiv_pd[which(indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+for (g in c("G1-I","G2-I","G1-OM","G2-OM","Autre")){
+  liste = which(indiv_pd$variables$group1_code == g & indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")
+  n_liste = length(liste)
+  nouv_pond[liste] = 1/n_liste
+  
+}
 
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_cnfpol_rec)) +
-  geom_bar(stat="identity")
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = nouv_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
 ```
 
 
@@ -171,13 +178,13 @@ Regardons la présence d'immigrés dans le quartier : pas d'effet clair non plus
 ## Recodage de indiv$l_immi en indiv$l_immi_rec
 indiv$l_immi_code <- as.character(indiv$l_immi)
 indiv$l_immi_code <- fct_recode(indiv$l_immi_code,
-                               "Tous" = "1",
-                               "sup 50%" = "2",
-                               "eq 50%" = "3",
-                               "inf 50%" = "4",
-                               "Aucun" = "5",
-                               "null" = "8",
-                               "null" = "9")
+                                "Tous" = "1",
+                                "sup 50%" = "2",
+                                "eq 50%" = "3",
+                                "inf 50%" = "4",
+                                "Aucun" = "5",
+                                "null" = "8",
+                                "null" = "9")
 
 indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
@@ -185,11 +192,14 @@ indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 ggsurvey(indiv_pd, aes(x = as.factor(l_immi_code), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
   geom_bar(stat = "identity")
 
-tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_immi_code, indiv_pd[which(indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_cnfpol_rec != "Total")
 
-ggplot(tb2, aes(x = l_immi_code, y= Freq, fill = i_cnfpol_rec)) +
-  geom_bar(stat="identity")
+immi_pond = pondation(indiv$l_immi_code,indiv$i_cnfpol_rec,"Refus ou ne sait pas")
+
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = immi_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(l_immi_code), y = immi_pond, fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
 
 
 ```
@@ -201,7 +211,7 @@ Et concernant les relations avec le quartiers : pas d'effet clair
 ```{r}
 #relations dans le quartier (a_rquart) (avec combien de personnes de ton quartier, es-tu ami ?)
 
-#indiv$a_rquart_rec
+indiv$a_rquart_rec
 
 ## Recodage de indiv$l_immi en indiv$l_immi_rec
 indiv$a_rquart_code <- as.character(indiv$a_rquart)
@@ -222,11 +232,13 @@ ggsurvey(indiv_pd, aes(x = as.factor(a_rquart_code), y = as.factor(i_cnfpol_rec)
   geom_bar(stat = "identity")
 
 
-tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+a_rquart_code, indiv_pd[which(indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+rquart_pond = pondation(indiv$a_rquart_code,indiv$i_cnfpol_rec,"Refus ou ne sait pas")
 
-ggplot(tb2, aes(x = a_rquart_code, y= Freq, fill = i_cnfpol_rec)) +
-  geom_bar(stat="identity")
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = rquart_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(a_rquart_code), y = rquart_pond, fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
 
 ```
 
@@ -235,7 +247,7 @@ Concernant la sécu : se sentir en sécurité favorise la confiance (légère co
 
 ```{r}
 #sécurité du quartier(l_quart_secu)
-
+#relations dans le quartier (a_rquart) (avec combien de personnes de ton quartier, es-tu ami ?)
 
 indiv$l_quart_secu_rec
 
@@ -246,11 +258,14 @@ ggsurvey(indiv_pd, aes(x = as.factor(l_quart_secu_rec), y = as.factor(i_cnfpol_r
   geom_bar(stat = "identity")
 
 
-tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_quart_secu_rec, indiv_pd[which(indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+secu_pond = pondation(indiv$l_quart_secu_rec,indiv$i_cnfpol_rec,"Refus ou ne sait pas")
 
-ggplot(tb2, aes(x = l_quart_secu_rec, y= Freq, fill = i_cnfpol_rec)) +
-  geom_bar(stat="identity")
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = secu_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(l_quart_secu_rec), y = secu_pond, fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
+
 
 
 ```
@@ -268,23 +283,24 @@ group_qpv = rep("null",dimension[1])
 
 group_qpv[which(indiv$qpv_i == 0 & indiv$group1_code=="G1-I")] = "G1-I out QPV"
 group_qpv[which(indiv$qpv_i == 1 & indiv$group1_code=="G1-I")] = "G1-I in QPV"
-group_qpv[which(indiv$qpv_i == 0 & indiv$group1_code=="G2-I")] = "G2-I out QPV"
-group_qpv[which(indiv$qpv_i == 1 & indiv$group1_code=="G2-I")] = "G2-I in QPV"
+#group_qpv[which(indiv$qpv_i == 0 & indiv$group1_code=="G2-I")] = "G2-I out QPV"
+#group_qpv[which(indiv$qpv_i == 1 & indiv$group1_code=="G2-I")] = "G2-I in QPV"
 group_qpv[which(indiv$qpv_i == 0 & indiv$group1_code=="Autre")] = "Autre out QPV"
 group_qpv[which(indiv$qpv_i == 1 & indiv$group1_code=="Autre")] = "Autre in QPV"
 
 
 indiv["group_QPV"] = group_qpv
 
+qpv_pond = pondation(indiv$group_QPV,indiv$i_cnfpol_rec,"Refus ou ne sait pas")
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = qpv_pond)
+
 
 ggsurvey(indiv_pd, aes(x = as.factor(group_QPV), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
   geom_bar(stat = "identity")
 
-tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+group_QPV, indiv_pd[which(indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_cnfpol_rec != "Total")
-
-ggplot(tb2, aes(x = group_QPV, y= Freq, fill = i_cnfpol_rec)) +
-  geom_bar(stat="identity")
+ggsurvey(indiv_pd2[which(indiv["group_QPV"]!="null")], aes(x = as.factor(group_QPV), y = qpv_pond[which(indiv["group_QPV"]!="null")], fill = as.factor(i_cnfpol_rec)))+
+  geom_bar(stat = "identity")
 
 
 
@@ -304,11 +320,10 @@ Les variables d'intérêt sont
 ggsurvey(indiv_pd, aes(x = as.factor(group1_code), y = as.factor(i_contri_rec), fill = as.factor(i_contri_rec)))+
   geom_bar(stat = "identity")
 
-tb1 <- data.frame(cprop(svytable(~i_contri_rec+group1_code, indiv_pd[which(indiv_pd$variables$i_contri_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_contri_rec != "Total")
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = nouv_pond)
 
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_contri_rec)) +
-  geom_bar(stat="identity")
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_contri_rec)))+
+  geom_bar(stat = "identity")
 
 
 ```
@@ -321,30 +336,32 @@ De plus nous remarquons que la case "Autre" (= ni immigrés ni descendants d'imm
 
 ---------------------------
 
-Nous pourrions désormais observer si le fait de vivre dans certains quartier favorisent les controles de police : légère corrélation entre le nombre de controle subies par personne et le présence d'immigrés dans le quartier d'habitation.
+Nous pourrions désormais observer si le fait de vivre dans certains quartier favorisent les controles de police : très légère corrélation entre le nombre de controle subies par personne et le présence d'immigrés dans le quartier d'habitation.
 
 ```{r}
 #présence d'immigrés dans le quartier (l_immi)
-
-
-ggsurvey(indiv_pd, aes(x = as.factor(l_immi_code), y = as.factor(i_contri_rec), fill = as.factor(i_contri_rec)))+
-  geom_bar(stat = "identity")
-
-
-tb1 <- data.frame(cprop(svytable(~i_contri_rec+l_immi_code, indiv_pd[which(indiv_pd$variables$i_contri_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_contri_rec != "Total")
-
-ggplot(tb2, aes(x = l_immi_code, y= Freq, fill = i_contri_rec)) +
-  geom_bar(stat="identity")
-
-
-```
-
-La fréquence des controles de police peut-elle expliquer le sentiment de sécurité ?
-Ou bien est-ce le sentiment de sécurité qui pourrait expliquer la fréquence des controles ?
-Ou les deux ?
-
-A priori déclarer être dans un quartier où la sécurité est mauvaise favorise le fait d'être controlé
+                                             
+                                             
+                                             ggsurvey(indiv_pd, aes(x = as.factor(l_immi_code), y = as.factor(i_contri_rec), fill = as.factor(i_contri_rec)))+
+                                               geom_bar(stat = "identity")
+                                             
+                                             
+                                             immi_pond = pondation(indiv$l_immi_code,indiv$i_contri_rec,"Refus ou ne sait pas")
+                                             
+                                             
+                                             indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = immi_pond)
+                                             
+                                             ggsurvey(indiv_pd2, aes(x = as.factor(l_immi_code), y = immi_pond, fill = as.factor(i_contri_rec)))+
+                                               geom_bar(stat = "identity")
+                                             
+                                             
+                                             ```
+                                             
+                                             La fréquence des controles de police peut-elle expliquer le sentiment de sécurité ?
+                                               Ou bien est-ce le sentiment de sécurité qui pourrait expliquer la fréquence des controles ?
+                                               Ou les deux ?
+                                               
+                                               A priori déclarer être dans un quartier où la sécurité est mauvaise favorise le fait d'être controlé
 
 ```{r}
 #sécurité du quartier(l_quart_secu)
@@ -357,11 +374,13 @@ ggsurvey(indiv_pd, aes(x = as.factor(l_quart_secu_rec), y = as.factor(i_contri_r
   geom_bar(stat = "identity")
 
 
-tb1 <- data.frame(cprop(svytable(~i_contri_rec+l_quart_secu_rec, indiv_pd[which(indiv_pd$variables$i_contri_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_contri_rec != "Total")
+secu_pond = pondation(indiv$l_quart_secu_rec,indiv$i_contri_rec,"Refus ou ne sait pas")
 
-ggplot(tb2, aes(x = l_quart_secu_rec, y= Freq, fill = i_contri_rec)) +
-  geom_bar(stat="identity")
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = secu_pond)
+
+ggsurvey(indiv_pd2, aes(x = as.factor(l_quart_secu_rec), y = secu_pond, fill = as.factor(i_contri_rec)))+
+  geom_bar(stat = "identity")
 
 
 
@@ -379,98 +398,86 @@ En ajoutant la catégorie G2 : on observe que les G2 sont plus controlé que les
 #Vivre dans un QPV (qpv_i)
 
 
+qpv_pond = pondation(indiv$group_QPV,indiv$i_contri_rec,"Refus ou ne sait pas")
+
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = qpv_pond)
+
 
 ggsurvey(indiv_pd, aes(x = as.factor(group_QPV), y = as.factor(i_contri_rec), fill = as.factor(i_contri_rec)))+
   geom_bar(stat = "identity")
 
-tb1 <- data.frame(cprop(svytable(~i_contri_rec+group_QPV, indiv_pd[which(indiv_pd$variables$i_contri_rec != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_contri_rec != "Total")
-
-ggplot(tb2, aes(x = group_QPV, y= Freq, fill = i_contri_rec)) +
-  geom_bar(stat="identity")
+ggsurvey(indiv_pd2[which(indiv["group_QPV"]!="null")], aes(x = as.factor(group_QPV), y = qpv_pond[which(indiv["group_QPV"]!="null")], fill = as.factor(i_contri_rec)))+
+  geom_bar(stat = "identity")
 
 
 
 ```
 Conclusion quant aux fréquences de controle : les G2 sont plus souvent controlés que les non-immigrés ni-descendants d'immigrés eux-même plus controlés que les G1.
-
-
-# i_control_rec : et concernant le déroulement du controle que se passe-t-il ?
-
-Je pense qu'il faudrait faire des courbes.
+                                             
+                                             
+                                             # i_control_rec : et concernant le déroulement du controle que se passe-t-il ?
+                                             
+                                             Je pense qu'il faudrait faire des courbes.
 
 ```{r}
 
 #group_1 :
+indiv_pd2 = svydesign(ids = indiv$ident, data = indiv, weights = nouv_pond)
 
-tb1 <- data.frame(cprop(svytable(~i_control_rec_a+group1_code, indiv_pd[which(indiv_pd$variables$i_control_rec_a != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_control_rec_a != "Total")
+rapport = function(varx,var_taux){
+  labels = unique(varx)
+  Y = rep(0,length(labels))
+  for (i in 1:length(labels)){
+    n_obj = length(which(varx==labels[i] && var_taux==1))
+    n_tot = length(which(varx==labels[i]))
+    Y[i] = n_obj/n_tot
+  }
+  plot(labels,Y)
+}
 
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_control_rec_a)) +
-  geom_bar(stat="identity")+
-  ggtitle("Ils vous ont expliqué ce qu'ils faisaient et pourquoi")
+rapport(indiv$group1_code,indiv$i_control_rec_a)
 
-
-
-```
-
-```{r}
-tb1 <- data.frame(cprop(svytable(~i_control_rec_b+group1_code, indiv_pd[which(indiv_pd$variables$i_control_rec_b != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_control_rec_b != "Total")
-
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_control_rec_b)) +
-  geom_bar(stat="identity")+
-  ggtitle("Ils ont été polis")
-
+#ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_control_rec_a)))+
+#geom_bar(stat = "identity")+
+#ggtitle("Ils vous ont expliqué ce qu'ils faisaient et pourquoi")
 
 ```
 
 ```{r}
-tb1 <- data.frame(cprop(svytable(~i_control_rec_c+group1_code, indiv_pd[which(indiv_pd$variables$i_control_rec_c != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_control_rec_c != "Total")
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_control_rec_b)))+
+geom_bar(stat = "identity")+
+ggtitle("Ils ont été polis")
+```
 
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_control_rec_c)) +
-  geom_bar(stat="identity")+
+```{r}
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_control_rec_c)))+
+geom_bar(stat = "identity")+
 ggtitle("Ils vous ont tutoyé")
 ```
 
 ```{r}
-tb1 <- data.frame(cprop(svytable(~i_control_rec_d+group1_code, indiv_pd[which(indiv_pd$variables$i_control_rec_d != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_control_rec_d != "Total")
-
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_control_rec_d)) +
-  geom_bar(stat="identity")+
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_control_rec_d)))+
+geom_bar(stat = "identity")+
 ggtitle("Ils ont fouillé vos vêtements et vos sacs")
 ```
 
 ```{r}
-tb1 <- data.frame(cprop(svytable(~i_control_rec_e+group1_code, indiv_pd[which(indiv_pd$variables$i_control_rec_e != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_control_rec_e != "Total")
-
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_control_rec_e)) +
-  geom_bar(stat="identity")+
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_control_rec_e)))+
+geom_bar(stat = "identity")+
 ggtitle("Ils vous ont provoqué, insulté")
 ```
 
 ```{r}
-tb1 <- data.frame(cprop(svytable(~i_control_rec_f+group1_code, indiv_pd[which(indiv_pd$variables$i_control_rec_f != "Refus ou ne sait pas")])))
-tb2 <- filter(tb1,i_control_rec_f != "Total")
-
-ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_control_rec_f)) +
-  geom_bar(stat="identity")+
+ggsurvey(indiv_pd2, aes(x = as.factor(group1_code), y = nouv_pond, fill = as.factor(i_control_rec_f)))+
+geom_bar(stat = "identity")+
 ggtitle("Ils ont été brutaux")
 ```
 
 
+
+
+
 ## Confiance et discriminations
 
-```{r}
-
-
-df = indiv_pd[c("","i_control_rec_e","i_control_rec_f")]
-
-
-```
-
-
+Discrimination
 
