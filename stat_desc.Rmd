@@ -72,7 +72,6 @@ Graphique relatif de la confiance envers la police :
 
 ```{r}
 #Si il faut faire une repondération :
-dimension = dim(indiv_pd)
 
 nouv_pond = rep(0,dimension[1])
 
