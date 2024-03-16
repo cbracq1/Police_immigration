@@ -45,16 +45,6 @@ stable <- svytable(~i_cnfpol_rec + group1_rec, indiv_pd)
 ```
 
 ```{r}
-indiv$group1_code <- as.character(indiv$group1)
-indiv$group1_code <- fct_recode(indiv$group1_code,
-                               "G1_I" = "1",
-                               "G1_OM" = "2",
-                               "G2_I" = "3",
-                               "G2_OM" = "4",
-                               "Autre" = "5"
-)
-
-indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
 
 
@@ -208,18 +198,6 @@ non plus
 #indiv$l_immi
 #indiv$l_immi_rec
 
-## Recodage de indiv$l_immi en indiv$l_immi_rec
-indiv$l_immi_code <- as.character(indiv$l_immi)
-indiv$l_immi_code <- fct_recode(indiv$l_immi_code,
-                               "Tous" = "1",
-                               "sup 50%" = "2",
-                               "eq 50%" = "3",
-                               "inf 50%" = "4",
-                               "Aucun" = "5",
-                               "null" = "8",
-                               "null" = "9")
-
-indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
 
 ggsurvey(indiv_pd, aes(x = as.factor(l_immi_code), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
@@ -241,16 +219,7 @@ Et concernant les relations avec le quartiers : pas d'effet clair
 
 #indiv$a_rquart_rec
 
-## Recodage de indiv$l_immi en indiv$l_immi_rec
-indiv$a_rquart_code <- as.character(indiv$a_rquart)
-indiv$a_rquart_code <- fct_recode(indiv$a_rquart_code,
-                               "Tous" = "1",
-                               "sup 50%" = "2",
-                               "eq 50%" = "3",
-                               "inf 50%" = "4",
-                               "Aucun" = "5",
-                               "null" = "8",
-                               "null" = "9")
+
 
 
 indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
@@ -276,8 +245,6 @@ corrélation)
 
 
 
-
-indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
 
 ggsurvey(indiv_pd, aes(x = as.factor(l_quart_secu_rec), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
@@ -403,7 +370,6 @@ favorise le fait d'être controlé
 #sécurité du quartier(l_quart_secu)
 
 
-indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
 
 ggsurvey(indiv_pd, aes(x = as.factor(l_quart_secu_rec), y = as.factor(i_contri_rec), fill = as.factor(i_contri_rec)))+

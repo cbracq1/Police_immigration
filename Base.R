@@ -218,6 +218,155 @@ indiv$origine_tous_g2_rec <- fct_recode(indiv$origine_tous_g2_rec,
 )
 
 
+
+## Recodage de indiv$origine_tous_g2 en indiv$origine_tous_g2_class
+indiv$origine_tous_g2_class <- as.character(indiv$origine_tous_g2)
+indiv$origine_tous_g2_class <- fct_recode(indiv$origine_tous_g2_class,
+                                        "Sans ascendance direct" = "0",
+                                        "G1 français ne hors de France métro" = "10",
+                                        "G2 français ne hors de France métro" = "11",
+                                        "G1 d'Outre-mer" = "20",
+                                        "G2 d'Outre-mer" = "22",
+                                        "G1 Maghreb" = "30",
+                                        "G2 Maghreb" = "33",
+                                        "G1 Maghreb" = "40",
+                                        "G2 Maghreb" = "44",
+                                        "G1 Sahel" = "50",
+                                        "G2 Sahel" = "55",
+                                        "G1 Guinée" = "60",
+                                        "G2 Guinée" = "66",
+                                        "G1 Afrique" = "70",
+                                        "G2 Afrique" = "77",
+                                        "G1 Asie" = "80",
+                                        "G2 Asie" = "88",
+                                        "G1 Trurquie/Moyen-Orient" = "90",
+                                        "G2 Turquie/Moyen-Orient" = "99",
+                                        "G1 Chine" = "100",
+                                        "G1 Asie" = "110",
+                                        "G2 Asie" = "111",
+                                        "G1 Europe" = "120",
+                                        "G2 Europe" = "121",
+                                        "G1 Europe" = "130",
+                                        "G2 Europe" = "131",
+                                        "G1 Europe" = "140",
+                                        "G2 Europe" = "141",
+                                        "G1 Europe" = "150",
+                                        "G2 Europe" = "151",
+                                        "G1 Autre" = "160",
+                                        "G2 Autre" = "161"
+)
+
+
+
+## Recodage de indiv$origine_tous_g2 en indiv$origine_tous_g2_cont
+indiv$origine_tous_g2_cont <- as.character(indiv$origine_tous_g2)
+indiv$origine_tous_g2_cont <- fct_recode(indiv$origine_tous_g2_cont,
+                                          "Sans ascendance direct" = "0",
+                                          "G1 français ne hors de France métro" = "10",
+                                          "G2 français ne hors de France métro" = "11",
+                                          "G1 d'Outre-mer" = "20",
+                                          "G2 d'Outre-mer" = "22",
+                                          "G1 Afrique" = "30",
+                                          "G2 Afrique" = "33",
+                                          "G1 Afrique" = "40",
+                                          "G2 Afrique" = "44",
+                                          "G1 Afrique" = "50",
+                                          "G2 Afrique" = "55",
+                                          "G1 Afrique" = "60",
+                                          "G2 Afrique" = "66",
+                                          "G1 Afrique" = "70",
+                                          "G2 Afrique" = "77",
+                                          "G1 Asie" = "80",
+                                          "G2 Asie" = "88",
+                                          "G1 Asie" = "90",
+                                          "G2 Asie" = "99",
+                                          "G1 Asie" = "100",
+                                          "G1 Asie" = "110",
+                                          "G2 Asie" = "111",
+                                          "G1 Europe" = "120",
+                                          "G2 Europe" = "121",
+                                          "G1 Europe" = "130",
+                                          "G2 Europe" = "131",
+                                          "G1 Europe" = "140",
+                                          "G2 Europe" = "141",
+                                          "G1 Europe" = "150",
+                                          "G2 Europe" = "151",
+                                          "G1 Autre" = "160",
+                                          "G2 Autre" = "161"
+)
+
+
+## Recodage de indiv$origine_tous_g2 en indiv$origine_tous_g2_corrupt
+indiv$origine_tous_g2_corrupt <- as.character(indiv$origine_tous_g2)
+indiv$origine_tous_g2_corrupt <- fct_recode(indiv$origine_tous_g2_corrupt,
+                                            "Sans ascendance direct" = "0",
+                                            "Autres français ne hors de France métro" = "10",
+                                            "Descendants de français ne hors de France métro" = "11",
+                                            "Originaires d'Outre-mer" = "20",
+                                            "Descendants d'originaire(s) d'Outre-mer" = "22",
+                                            "Immigres d'Algerie" = "30",
+                                            "Descendants d'immigres(s) originaires d'Algerie" = "33",
+                                            "Immigres du Maroc/Tunisie" = "40",
+                                            "Descendants d'immigre(s) originaires du Maroc/Tunisie" = "44",
+                                            "Immigres d'Afrique sahelienne" = "50",
+                                            "Descendants d'immigre(s) originaires d'Afrique sahelienne" = "55",
+                                            "Immigres d'Afrique guineenne/centrale" = "60",
+                                            "Descendants d'immigre(s) originaires d'Afrique guineenne/centrale" = "66",
+                                            "Immigres d'autres pays d'Afrique" = "70",
+                                            "Descendants d'immigre(s) originaires d'autres pays d'Afrique" = "77",
+                                            "Immigres d'Asie du Sud-est" = "80",
+                                            "Descendants d'immigre(s) originaires d'Asie du Sud-est" = "88",
+                                            "Immigres de Trurquie/Moyen-Orient" = "90",
+                                            "Descendants d'immigre(s) originaires de Turquie/Moyen-Orient" = "99",
+                                            "Immigres de Chine" = "100",
+                                            "Immigres d'autres pays d'Asie" = "110",
+                                            "Descendants d'immigre(s) originaires d'autres pays d'Asie" = "111",
+                                            "Immigres du Portugal" = "120",
+                                            "Descendants d'immigre(s) originaires du Portugal" = "121",
+                                            "Immigres d'Espagne/Italie" = "130",
+                                            "Descendants d'immigre(s) originaires d'Espagne/Italie" = "131",
+                                            "Immigres d'autres pays de l'UE27" = "140",
+                                            "Descendants d'immigre(s) originaires d'autres pays de l'UE27" = "141",
+                                            "Immigres d'autres pays d'Europe" = "150",
+                                            "Descendants d'immigre(s) originaires d'autres pays d'Europe" = "151",
+                                            "Immigres d'autres pays" = "160",
+                                            "Descendants d'immigre(s) originaires d'autres pays" = "161"
+)
+
+##############################################Recodage de lecture
+indiv$group1_code <- as.character(indiv$group1)
+indiv$group1_code <- fct_recode(indiv$group1_code,
+                                "G1_I" = "1",
+                                "G1_OM" = "2",
+                                "G2_I" = "3",
+                                "G2_OM" = "4",
+                                "Autre" = "5"
+)
+
+
+## Recodage de indiv$l_immi en indiv$l_immi_rec
+indiv$l_immi_code <- as.character(indiv$l_immi)
+indiv$l_immi_code <- fct_recode(indiv$l_immi_code,
+                                "Tous" = "1",
+                                "sup 50%" = "2",
+                                "eq 50%" = "3",
+                                "inf 50%" = "4",
+                                "Aucun" = "5",
+                                "null" = "8",
+                                "null" = "9")
+
+## Recodage de indiv$l_immi en indiv$l_immi_rec
+indiv$a_rquart_code <- as.character(indiv$a_rquart)
+indiv$a_rquart_code <- fct_recode(indiv$a_rquart_code,
+                                  "Tous" = "1",
+                                  "sup 50%" = "2",
+                                  "eq 50%" = "3",
+                                  "inf 50%" = "4",
+                                  "Aucun" = "5",
+                                  "null" = "8",
+                                  "null" = "9")
+
+
 #Faisons de i_controla et i_controlb une seule est même variable :
 
 ## A : Ils vous ont expliqué ce qu'ils faisaient et pourquoi

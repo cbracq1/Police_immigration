@@ -1,0 +1,77 @@
+---
+title: "ACM et Arbre de décision"
+author: "Bracq, Raymond"
+date: "28/11/2023"
+output:
+  html_notebook: 
+    encoding: UTF-8
+  pdf_document: default
+  html_document:
+    df_print: paged
+    encoding: UTF-8
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+# Projet DSSS : Police et immigration {.tabset .tabset-fade}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include = FALSE}
+library(haven)
+library(tidyverse)
+library(dplyr)
+library(labelled)
+library(survey)
+library(arrow)
+library(ggplot2)
+library(questionr)
+install.packages("rpart") #pour l'arbre de décision
+library(rpart)
+install.packages("rpart.plot")
+library(rpart.plot)
+```
+
+```{r base, include = FALSE}
+source("Base.R")
+```
+
+
+# Un Arbre de décision : pour construire un arbre de décision nous commencerons par identifier des features et des labels. En particulier, nous cherchons à expliquer la confiance en la police (le label) en fonction des features suivantes :
+- l'age (agenq)
+- la durée de séjour en France métropolitaine (durar2)
+- le pays de naissance
+- le fait d'être descendant d'immigré
+- la frequence de controle policier
+- le sentiment de sécurité
+- la présence d'immigré dans le quartier
+- le fait de vivre dans un QPV
+
+Voir si on ne remet pas les modalités en chiffre ici.
+
+Nous allons a minima transformer notre label en variable binaire = 1(i_cnfpol_rec = Tout à fait)
+
+
+```{r base, include = FALSE}
+
+indiv["i_cnfpol_1"] = (indiv$i_cnfpol == 1)*1
+
+data = select(indiv,c(i_cnfpol_1,agenq, durar2, group1_code,origine_tous_g2_class,i_contri_rec,l_quart_secu_rec,l_immi_code,qpv_i,a_rquart_code))
+
+
+fit <- rpart(i_cnfpol_1~group1_code + durar2, data = data, method = 'class')
+rpart.plot(fit, extra = 106)
+
+
+
+
+
+
+```
+
+
+
+
