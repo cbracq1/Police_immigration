@@ -73,7 +73,6 @@ Graphique relatif de la confiance envers la police :
 
 ```{r}
 #Si il faut faire une repondération :
-dimension = dim(indiv_pd)
 
 
 tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+group1_code, indiv_pd[which(indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
