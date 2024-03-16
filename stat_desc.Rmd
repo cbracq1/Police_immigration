@@ -14,12 +14,11 @@ editor_options:
     wrap: 72
 ---
 
-# Projet DSSS : Police et immigration{.tabset .tabset-fade}
+# Projet DSSS : Police et immigration {.tabset .tabset-fade}
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 
 ```{r libraries, include = FALSE}
 library(haven)#si t'as pas les packages il faut faire install.packages("nom du package") dans la console
@@ -37,8 +36,9 @@ source("Base.R")
 ```
 
 ## Confiance en la police
-La variable d'intérêt est i_cnfpol :
-Avez-vous confiance dans les institutions suivantes en France : la police
+
+La variable d'intérêt est i_cnfpol : Avez-vous confiance dans les
+institutions suivantes en France : la police
 
 ```{r, echo = FALSE}
 stable <- svytable(~i_cnfpol_rec + group1_rec, indiv_pd)
@@ -47,10 +47,10 @@ stable <- svytable(~i_cnfpol_rec + group1_rec, indiv_pd)
 ```{r}
 indiv$group1_code <- as.character(indiv$group1)
 indiv$group1_code <- fct_recode(indiv$group1_code,
-                               "G1-I" = "1",
-                               "G1-OM" = "2",
-                               "G2-I" = "3",
-                               "G2-OM" = "4",
+                               "G1_I" = "1",
+                               "G1_OM" = "2",
+                               "G2_I" = "3",
+                               "G2_OM" = "4",
                                "Autre" = "5"
 )
 
@@ -68,6 +68,7 @@ ggsurvey(indiv_pd, aes(x = as.factor(group1_code), y = as.factor(i_cnfpol_rec), 
 
 
 ```
+
 Graphique relatif de la confiance envers la police :
 
 ```{r}
@@ -82,13 +83,15 @@ ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_cnfpol_rec)) +
   geom_bar(stat="identity")
 ```
 
-
-La durée de séjour dans le pays de résidence a-t-elle une influence sur la confiance envers la police ?
+La durée de séjour dans le pays de résidence a-t-elle une influence sur
+la confiance envers la police ?
 
 ```{r}
 
 coloration = c("red","orange","purple","blue","green")
-group_un = c("G1-I","G2-I","G1-OM","G2-OM","Autre")
+group_un = c("G1_I","G2_I","G1_OM","G2_OM","Autre")
+
+df = data.frame(X = 1:100)
 
 for (i in 1:5){ #Pour chaque groupe : traçons une courbe confiance envers la police ~ durée de sejour
   
@@ -97,32 +100,65 @@ for (i in 1:5){ #Pour chaque groupe : traçons une courbe confiance envers la po
   #durée de sejour depuis la première arrivée : $durtotfrm
   #durée de sejour depuis la dernière arrivée : $durar2
   
-  data = indiv_pd2[which(indiv_pd2$variables$group1_code == g)]
+  data = filter(indiv,group1_code == g)
   
-  X = 0:100
+  X = 1:100
   Y = c()
   for (x in X){
-    n_tot = length(which(data$variables$durar2==x & data$variables$i_cnfpol_rec != "Refus ou ne sait pas"))
-    n_obj = length(which(data$variables$durar2==x & data$variables$i_cnfpol_rec == "Tout à fait confiance en la police")) #Avoir confiance = Tout à fait confiance
-    Y = c(Y,n_obj/n_tot)
+    datax = filter(data,durar2==x & data$i_cnfpol_rec != "Refus ou ne sait pas")
+    datax_obj = filter(datax,i_cnfpol_rec == "Tout à fait confiance en la police")
+ 
+    n_tot = sum(datax$poidsi)
+    n_obj = sum(datax_obj$poidsi)
+    if (n_tot == 0){
+      Y = c(Y,0)
+    }
+    else{
+      Y=c(Y,n_obj/n_tot)
+    }
   }
   
-  plot(X,Y,type="l", xlim = c(0,70), ylim = c(0,1),col=coloration[i])
-  par(new=T)
+  df[paste(g,"_","Y",sep="")] = Y
+  
 }
+  #ggplot(df,aes(x = duree_de_sejour, y = pourcentage_de_confiance))+geom_smooth()
+  plot(X,Y,type="l", xlim = c(0,70), ylim = c(0,1),col=coloration[i])
+  legend(50,1,legend=c("G1-I","G2-I","Autre","G2-OM","G2-I"),col=c("red","orange","green","blue","purple"),lty=c(1,1,1,1,1,1),cex=0.8)
+  #par(new=T)
 ```
 
-Ici nous remarquons pour les immigrés, une tendance à avoir de moins en moins confiance en la police selon la durée de séjour : ceci viendrait confirmer notre hypothèse. 
+```{r}
+ggplot(df,aes(x =X))+
+  geom_point(aes(y = G1_I_Y),color="red", alpha = 0.5)+
+  geom_point(aes(y=Autre_Y),color="green", alpha = 0.5)+
+  geom_point(aes(y = G2_I_Y),color="orange", alpha = 0.5)+
+  geom_point(aes(y = G1_OM_Y),color="purple", alpha = 0.5)+
+  geom_point(aes(y = G2_OM_Y),color="blue", alpha = 0.5)+
+  geom_smooth(aes(y = G1_I_Y),color="red")+
+  geom_smooth(aes(y = G2_I_Y),color="orange")+
+  geom_smooth(aes(y = G1_OM_Y),color="purple")+
+  geom_smooth(aes(y = G2_OM_Y),color="blue")+
+  geom_smooth(aes(y=Autre_Y),color="green")
 
+
+
+
+```
+
+
+Ici nous remarquons pour les immigrés, une tendance à avoir de moins en
+moins confiance en la police selon la durée de séjour : ceci viendrait
+confirmer notre hypothèse.
 
 Et en travaillant à âge égal ?
 
 ```{r}
 
-coloration = c("red","orange","yellow","green","blue","purple")
 
-l_age_inf = c(0,20,30,40,50,60)
-l_age_sup = c(19,29,39,49,59,100)
+coloration = c("red","orange","green","blue")
+
+l_age_inf = c(18,30,40,50)
+l_age_sup = c(29,39,49,59)
 
 for (i in 1:6){ #Pour chaque groupe : traçons une courbe confiance envers la police ~ durée de sejour
   
@@ -134,32 +170,39 @@ for (i in 1:6){ #Pour chaque groupe : traçons une courbe confiance envers la po
   #durée de sejour depuis la première arrivée : $durtotfrm
   #durée de sejour depuis la dernière arrivée : $durar2
   
-  data = indiv_pd2[which(indiv_pd2$variables$group1_code == g & indiv_pd2$variables$agenq >= age_inf & indiv_pd2$variables$agenq <= age_sup)]
+  data = filter(indiv,group1_code == g & indiv$agenq >= age_inf & indiv$agenq <= age_sup)
   
-  X = 0:100
+  X = 1:100
   Y = c()
   for (x in X){
-    n_tot = length(which(data$variables$durar2==x & data$variables$i_cnfpol_rec != "Refus ou ne sait pas"))
-    n_obj = length(which(data$variables$durar2==x & data$variables$i_cnfpol_rec == "Tout à fait confiance en la police")) #Avoir confiance = Tout à fait confiance
-    Y = c(Y,n_obj/n_tot)
+    datax = filter(data,durar2==x & data$i_cnfpol_rec != "Refus ou ne sait pas")
+    datax_obj = filter(datax,i_cnfpol_rec == "Tout à fait confiance en la police")
+ 
+    n_tot = sum(datax$poidsi)
+    n_obj = sum(datax_obj$poidsi)
+    if (n_tot == 0){
+      Y = c(Y,0)
+    }
+    else{
+      Y=c(Y,n_obj/n_tot)
+    }
   }
   
   plot(X,Y,type="l", xlim = c(0,70), ylim = c(0,1),col=coloration[i])
-  legend(50,1,legend=c("< 20 ans","> 20 et < 30 ans","> 30 et < 40 ans","> 40 et < 50 ans","> 50 et < 60 ans","> 60 ans"),col=c("red","orange","yellow","green","blue","purple"),lty=c(1,1,1,1,1,1),cex=0.8)  
+  #ggplot(indiv,aes(x=duree,y=taux))+geom_smooth()
+  legend(50,1,legend=c("> 18 et < 30 ans","> 30 et < 40 ans","> 40 et < 50 ans","> 50 et < 60 ans"),col=c("red","orange","green","blue"),lty=c(1,1,1,1,1,1),cex=0.8)  
   par(new=T)
 }
-
-
 ```
 
-
-
-Cette diminution de la confiance envers la police persévère ! (malgré une légère remontée pour les cinquantenaires arrivé très jeune en France)
+Cette diminution de la confiance envers la police persévère ! (malgré
+une légère remontée pour les cinquantenaires arrivé très jeune en
+France)
 
 Nous continuons de confirmer notre hypothèse.
 
-
-Regardons la présence d'immigrés dans le quartier : pas d'effet clair non plus
+Regardons la présence d'immigrés dans le quartier : pas d'effet clair
+non plus
 
 ```{r}
 #présence d'immigrés dans le quartier (l_immi)
@@ -192,9 +235,7 @@ ggplot(tb2, aes(x = l_immi_code, y= Freq, fill = i_cnfpol_rec)) +
 
 ```
 
-
 Et concernant les relations avec le quartiers : pas d'effet clair
-
 
 ```{r}
 #relations dans le quartier (a_rquart) (avec combien de personnes de ton quartier, es-tu ami ?)
@@ -228,14 +269,14 @@ ggplot(tb2, aes(x = a_rquart_code, y= Freq, fill = i_cnfpol_rec)) +
 
 ```
 
-
-Concernant la sécu : se sentir en sécurité favorise la confiance (légère corrélation)
+Concernant la sécu : se sentir en sécurité favorise la confiance (légère
+corrélation)
 
 ```{r}
 #sécurité du quartier(l_quart_secu)
 
 
-indiv$l_quart_secu_rec
+
 
 indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
@@ -253,9 +294,9 @@ ggplot(tb2, aes(x = l_quart_secu_rec, y= Freq, fill = i_cnfpol_rec)) +
 
 ```
 
-
-
-Concernant le fait de vivre dans une QPV : il n'apparait pas clair que cette variable ait un impact sur le niveau de confiance envers la police des personnes immigrés.
+Concernant le fait de vivre dans une QPV : il n'apparait pas clair que
+cette variable ait un impact sur le niveau de confiance envers la police
+des personnes immigrés.
 
 ```{r}
 
@@ -284,17 +325,22 @@ tb2 <- filter(tb1,i_cnfpol_rec != "Total")
 ggplot(tb2, aes(x = group_QPV, y= Freq, fill = i_cnfpol_rec)) +
   geom_bar(stat="identity")
 
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+qpv_i_rec, indiv_pd[which(indiv_pd$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = qpv_i_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
 
 
 ```
 
 ## Discriminations
-Les variables d'intérêt sont 
--> i_contri : fqce des controle par la police
--> i_controla & i_controlb : en une seule variable i_control_rec (_a,_b,...,_g,_flag)
 
+Les variables d'intérêt sont -\> i_contri : fqce des controle par la
+police -\> i_controla & i_controlb : en une seule variable i_control_rec
+(\_a,\_b,...,\_g,\_flag)
 
-#Faisons une première étude sur la fréquence des controles de police
+###Faisons une première étude sur la fréquence des controles de police
 
 ```{r}
 
@@ -310,16 +356,25 @@ ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_contri_rec)) +
 
 
 ```
-On remarque les G2 sont plus touchés par les contôles policiers que les G1 (pour les I et les OM) : ça pourrait être intéressant de regarder selon l'âge.
 
-Nous pourrions déjà trouver une première explication à notre apparent paradoxe : les G2 (certainement plus jeunes) sont plus controlés que les G1 (certainement plus vieux). Ceci ajoute une explication à la différence G1-G2.
+On remarque les G2 sont plus touchés par les contôles policiers que les
+G1 (pour les I et les OM) : ça pourrait être intéressant de regarder
+selon l'âge.
 
-De plus nous remarquons que la case "Autre" (= ni immigrés ni descendants d'immigrés) sont plus controlé que les G1 par la police.
+Nous pourrions déjà trouver une première explication à notre apparent
+paradoxe : les G2 (certainement plus jeunes) sont plus controlés que les
+G1 (certainement plus vieux). Ceci ajoute une explication à la
+différence G1-G2.
 
+De plus nous remarquons que la case "Autre" (= ni immigrés ni
+descendants d'immigrés) sont plus controlé que les G1 par la police.
 
----------------------------
+------------------------------------------------------------------------
 
-Nous pourrions désormais observer si le fait de vivre dans certains quartier favorisent les controles de police : légère corrélation entre le nombre de controle subies par personne et le présence d'immigrés dans le quartier d'habitation.
+Nous pourrions désormais observer si le fait de vivre dans certains
+quartier favorisent les controles de police : légère corrélation entre
+le nombre de controle subies par personne et le présence d'immigrés dans
+le quartier d'habitation.
 
 ```{r}
 #présence d'immigrés dans le quartier (l_immi)
@@ -338,11 +393,12 @@ ggplot(tb2, aes(x = l_immi_code, y= Freq, fill = i_contri_rec)) +
 
 ```
 
-La fréquence des controles de police peut-elle expliquer le sentiment de sécurité ?
-Ou bien est-ce le sentiment de sécurité qui pourrait expliquer la fréquence des controles ?
-Ou les deux ?
+La fréquence des controles de police peut-elle expliquer le sentiment de
+sécurité ? Ou bien est-ce le sentiment de sécurité qui pourrait
+expliquer la fréquence des controles ? Ou les deux ?
 
-A priori déclarer être dans un quartier où la sécurité est mauvaise favorise le fait d'être controlé
+A priori déclarer être dans un quartier où la sécurité est mauvaise
+favorise le fait d'être controlé
 
 ```{r}
 #sécurité du quartier(l_quart_secu)
@@ -365,12 +421,14 @@ ggplot(tb2, aes(x = l_quart_secu_rec, y= Freq, fill = i_contri_rec)) +
 
 ```
 
-Enfin, est-ce que vivre en QPV est corrélé avec la frequence des controles de police ?
+Enfin, est-ce que vivre en QPV est corrélé avec la frequence des
+controles de police ?
 
-Nous constatons qu'il y a significativement plus de controle en vivant en QPV que non. Mais surtout plus de controle en n'étant pas G1 !
+Nous constatons qu'il y a significativement plus de controle en vivant
+en QPV que non. Mais surtout plus de controle en n'étant pas G1 !
 
-En ajoutant la catégorie G2 : on observe que les G2 sont plus controlé que les Autres qui le sont plus que les G1.
-
+En ajoutant la catégorie G2 : on observe que les G2 sont plus controlé
+que les Autres qui le sont plus que les G1.
 
 ```{r}
 
@@ -388,12 +446,20 @@ ggplot(tb2, aes(x = group_QPV, y= Freq, fill = i_contri_rec)) +
   geom_bar(stat="identity")
 
 
+tb1 <- data.frame(cprop(svytable(~i_contri_rec+qpv_i_rec, indiv_pd[which(indiv_pd$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_contri_rec != "Total")
+
+ggplot(tb2, aes(x = qpv_i_rec, y= Freq, fill = i_contri_rec)) +
+  geom_bar(stat="identity")
+
 
 ```
-Conclusion quant aux fréquences de controle : les G2 sont plus souvent controlés que les non-immigrés ni-descendants d'immigrés eux-même plus controlés que les G1.
 
+Conclusion quant aux fréquences de controle : les G2 sont plus souvent
+controlés que les non-immigrés ni-descendants d'immigrés eux-même plus
+controlés que les G1.
 
-# i_control_rec : et concernant le déroulement du controle que se passe-t-il ?
+### i_control_rec : et concernant le déroulement du controle que se passe-t-il ?
 
 Je pense qu'il faudrait faire des courbes.
 
@@ -459,7 +525,6 @@ ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_control_rec_f)) +
 ggtitle("Ils ont été brutaux")
 ```
 
-
 ## Confiance et discriminations
 
 ```{r}
@@ -469,6 +534,3 @@ df = indiv_pd[c("","i_control_rec_e","i_control_rec_f")]
 
 
 ```
-
-
-

@@ -89,6 +89,7 @@ indiv$a_rquart_rec <- fct_recode(indiv$a_rquart_rec,
                                  "Refus ou ne sait pas" = "9"
 )
 
+
 ## Recodage de indiv$i_cnfpol en indiv$i_cnfpol_rec
 indiv$i_cnfpol_rec <- as.character(indiv$i_cnfpol)
 indiv$i_cnfpol_rec <- fct_recode(indiv$i_cnfpol_rec,
