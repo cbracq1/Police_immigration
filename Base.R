@@ -144,7 +144,7 @@ indiv$sexee_rec <- fct_recode(indiv$sexee_rec,
 ## Recodage de indiv$group1 en indiv$group1_rec
 indiv$group1_rec <- as.character(indiv$group1)
 indiv$group1_rec <- fct_recode(indiv$group1_rec,
-                               "Immigre (ne etranger à l'etranger y compris reintegres)" = "1",
+                               "Immigré (né étranger à l'étranger y compris réintégrés)" = "1",
                                "Originaire de l'Outre-mer" = "2",
                                "Descendant G2 d'un ou deux immigre(s)" = "3",
                                "Descendant G2 d'un ou deux originaire(s) d'outre-mer" = "4",

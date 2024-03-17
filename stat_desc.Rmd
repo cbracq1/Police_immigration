@@ -75,6 +75,18 @@ ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_cnfpol_rec)) +
 La durée de séjour dans le pays de résidence a-t-elle une influence sur
 la confiance envers la police ?
 
+```{r, recodage durée}
+# A passer dans la partie base si ça te va Julien (après l'avoir nettoyée des doubles code rec), à utiliser pour les graphes en dessous
+indiv <- indiv %>% 
+  mutate(durar2_tous = case_when(group1_rec=="Immigré (né étranger à l'étranger y compris réintégrés)"|group1_rec=="Originaire de l'Outre-mer"~durar2,
+                                 TRUE~agenq))
+
+indiv <- indiv %>% 
+  mutate(durtotfrm_tous = case_when(group1_rec=="Immigré (né étranger à l'étranger y compris réintégrés)"|group1_rec=="Originaire de l'Outre-mer"~durtotfrm,
+                                 TRUE~agenq))
+```
+
+
 ```{r}
 
 coloration = c("red","orange","purple","blue","green")
