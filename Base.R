@@ -413,15 +413,15 @@ indiv["i_control_rec_flag"] = res
 
 indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
-
-pondation = function(var,var_contrainte,contrainte,size=dimension[1]){
-  labels = unique(var)
-  p = rep(0,size)
-  
-  for (l in labels){
-    index = which(var==l & var_contrainte != contrainte)
-    p[index] = 1/length(index)
-  }
-  
-  return(p)
-}
+# 
+# pondation = function(var,var_contrainte,contrainte,size=dimension[1]){
+#   labels = unique(var)
+#   p = rep(0,size)
+#   
+#   for (l in labels){
+#     index = which(var==l & var_contrainte != contrainte)
+#     p[index] = 1/length(index)
+#   }
+#   
+#   return(p)
+# }

@@ -1,0 +1,123 @@
+---
+title: "ACM"
+author: "Bracq, Raymond"
+date: "17/03/2024"
+output:
+  html_notebook: 
+    encoding: UTF-8
+  pdf_document: default
+  html_document:
+    df_print: paged
+    encoding: UTF-8
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+# ACM
+
+L'idée c'est qu'il faut tout recoder de manière à ce qu'il n'y ait pas de modalités avec très peu de personnes (cette modalité surdetermine le graphe). On recode avec irec de questionr et on vérifie au préalable avec des svytable.
+Il faut aussi vérifier qu'on a pas de NA (les lignes avec un NA vont être supprimées dans l'ACM).
+
+```{r, include = FALSE}
+library(tidyverse)
+library(questionr)
+library(FactoMineR)
+library(factoextra)
+library(explor)
+library(Factoshiny)
+```
+
+## Préparation de la base
+
+```{r}
+indiv_acm1 <- indiv %>%
+  select(i_cnfpol_rec, i_contri_rec, i_control_rec_a, i_control_rec_b, i_control_rec_c, i_control_rec_d, i_control_rec_e, i_control_rec_f, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, durtotfrm, durar2, agenq) 
+```
+
+## Réalisation de l'ACM
+On tente une première ACM avec en actif les variables sur la police. 
+
+```{r}
+res <- MCA(indiv_acm1, quali.sup = c(8,13), quanti.sup = c(14, 16), weights(indiv$poidsi))#les supplémentaires sont aux rang 8à 16
+explor(res)
+MCAshiny(res)# ça permet de voir le graphe tester des choses, produire un rapport automatique et tester la classification
+```
+
+On pourra en tenter une autre avec en actif les autres variables.
+
+### Cours ENS - sans utiliser Factoshiny
+Peut être utile si on veut pas passer par Shiny parce que la base est trop lourde
+```{r, include = FALSE}
+### ACM ---------
+# premi�re tentative
+tt_acm <- tt[, c("DIP2", "SEXE", "concours", "cl_AGE", "contrat", "filiere", "secteur")]
+tt_acm <- lapply(tt_acm[,], factor)  ## passer tout en facteur
+tt_acm <- as.data.frame(tt_acm)
+
+res <- MCA(tt_acm) # 
+explor(res)
+
+# Deuxi�me tentative
+tt_acm <- tt[, c("DIP2", "SEXE", "filiere", "cl_AGE", "contrat", "secteur2", "tps_partiel", "traj_statut", "pcs", "traj_cho", "traj_empl")] # retrait de "concours"
+tt_acm <- lapply(tt_acm[,], factor)  ## passer tout en facteur
+tt_acm <- as.data.frame(tt_acm)
+
+res <- MCA(tt_acm, quali.sup = 6) # la 6eme variable de la liste (variable "secteur2") est ajout�e en suppl�mentaire
+explor(res)
+    
+table(tt$DIP2)
+
+### CLASSIFICATIONS ----
+
+# faire la classification par classfication ascendante hierarchique (CAH, HCPC en anglais)
+classif <- HCPC(res, graph = FALSE) 
+
+#repr�sentations
+plot.HCPC(classif, choice = "tree") # dessin du dendogramme
+plot.HCPC(classif, choice = "map") # repr�sentation en nuage : utile si peu d'individus
+
+# repr�sentations plus jolies (mais plus longues � faire)
+fviz_dend(classif, show_labels = FALSE)
+fviz_cluster(classif, geom = "point", main = "Factor map")
+
+# choix du nombre de classes
+classif <- HCPC(res, graph = FALSE, nb.clust = 3) # chercher un saut, 3 classes semblent pertinentes
+
+#### QUALIFIER LES CLASSES
+# par les individus (utile surtout si individus ont des noms, cf cas des communes d'IdF)
+classif$desc.ind$para # parangons, ie individus moyens de chaque classe
+classif$desc.ind$dist # individus les plus extremes, qui accentuent les cara de la classe
+
+# par les variables
+classif$desc.var$test.chi2 # variables qui sont les plus discriminantes
+classif$desc.var #pour le d�coupage en classes
+
+# R�introduire les classes ds la base
+classif$data.clust # contient la classe pour chaque individu
+names(classif$data.clust) # pour rep�rer le num�ro de la colonne "clust" (ici : 12)
+clust <- classif$data.clust[,12] # on ne conserve que la colonne contenant les classes
+tt <- cbind(tt, clust) # on l'ajoute � la table initiale : on a bien une variable clust qui contient la classe � laquelle appartient l'individu
+
+# on peut ensuite regarder les caract�ristiques pour chaque classe (ici le type de contrat)
+tb <- table(tt$clust, tt$contrat) # avec une var quali
+cprop(tb)
+rprop(tb)
+
+tapply(tt$AGE, tt$clust, mean) # avec une variable quanti (ici age moyen de chaque classe)
+
+
+#### RETOUR ACM ----
+tt_acm <- tt[, c("DIP2", "SEXE", "filiere", "cl_AGE", "contrat", "secteur2", "tps_partiel", "traj_statut", "pcs", "traj_cho", "traj_empl", "clust")]
+
+tt_acm <- lapply(tt_acm[,], factor)  ## passer tout en facteur
+tt_acm <- as.data.frame(tt_acm)
+
+res <- MCA(tt_acm, quali.sup = c(6,12))
+explor(res)
+
+
+
+
+```
+
