@@ -381,7 +381,7 @@ indiv$d_lieudisagr_d_rec <- as.factor(indiv$d_lieudisagr_d_rec)
 indiv <- indiv %>% 
   mutate(i_control_rec_a = case_when(i_controla_a == 1 | i_controlb_d==1 ~ "Ils vous ont expliqué ce qu'ils faisaient et pourquoi",
                                      i_controla_flag == 0 ~ "Question non posée (filtre)",
-                                     i_controla_flag == -1 | i_controla_flag == -2 ~ ~ "Refus ou ne sait pas",
+                                     i_controla_flag == -1 | i_controla_flag == -2 ~ "Refus ou ne sait pas",
                                      TRUE ~ "Ils ne vous ont rien expliqué"))
 indiv$i_control_rec_a <- as.factor(indiv$i_control_rec_a)
 
