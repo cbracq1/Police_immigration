@@ -11,3 +11,7 @@ Teo2/Doc/2. Le B.A.-BA de TeO2.docx
 *.sas7bcat
 *.sas7bdat
 *.html
+.RData
+.RData
+TeO2/Doc/.~lock.1. TeO2 - Guide d'utilisation et dictionnaire des variables_FPR.odt\#
+.Rhistory
