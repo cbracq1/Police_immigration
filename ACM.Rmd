@@ -64,11 +64,11 @@ On pourra en tenter une autre avec en actif les autres variables.
 indiv_acm2 <- indiv %>%
   filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
     filter(group1_code == "G1_I") %>% 
-  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec)  #, durtotfrm, durar2, agenq
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, durtotfrm, durar2, agenq)  #, durtotfrm, durar2, agenq
 ```
 
 ```{r}
-res <- MCA(indiv_acm2, quali.sup = c(4:8))#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+res <- MCA(indiv_acm2, quali.sup = c(4:8), quanti.sup = c(9:11))#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
 ```
 
 ```{r}
