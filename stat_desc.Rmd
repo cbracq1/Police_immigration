@@ -646,7 +646,25 @@ ggsurvey(indiv_pd) +
  coord_flip() +
  theme_minimal()
 ```
+Même stats desc seulement pour ceux qui ont eu un contrôle de police :
 
+```{r}
 
+indiv_contr <- indiv %>% filter(compor_discri %in% c("Discrimination dans le comportement de la police par le négatif", "Discrimination dans le comportement de la police par le positif", "Pas de comportement discriminatoire lors du dernier contrôle"))
+indiv_contr_pd <- svydesign(ids = indiv_contr$ident, data = indiv_contr, weights = indiv_contr$poidsi)
+
+ggsurvey(indiv_contr_pd) +
+ aes(x = i_cnfpol_rec, fill = compor_discri) +
+ geom_bar(position = "fill") +
+ scale_fill_hue(direction = 1) +
+ theme_minimal()
+
+ggsurvey(indiv_contr_pd) +
+ aes(x = origine_tous_g2_rec, fill = compor_discri) +
+ geom_bar(position = "fill") +
+ scale_fill_hue(direction = 1) +
+ coord_flip() +
+ theme_minimal()
+```
 
 
