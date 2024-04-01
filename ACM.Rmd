@@ -69,17 +69,78 @@ indices <- c(indices_to_exclude, indices_to_include)
 On tente une première ACM avec en actif les variables sur la police. 
 
 ```{r}
-res1 <- MCA(indiv_acm1, ind.sup = indices[8000:15000], quali.sup = 4:13, quanti.sup = 14:16)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+res1 <- MCA(indiv_acm1, quali.sup = 4:13, quanti.sup = 14:16, row.w = indiv_acm1_poids$poidsi)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
 
 ```
 
 
 ```{r}
-explor(res)
-HCPCshiny(res)# ça permet de voir le graphe tester des choses, produire un rapport automatique et tester la classification
+explor(res1)
+HCPCshiny(res1)# ça permet de voir le graphe tester des choses, produire un rapport automatique et tester la classification
 ```
 
-On pourra en tenter une autre avec en actif les autres variables.
+```{r}
+res.HCPC<-HCPC(res1,nb.clust=8,kk=100,consol=FALSE,graph=FALSE)
+res.HCPC$data.clust # contient la classe pour chaque individu
+clust_8 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_8) 
+
+res.HCPC<-HCPC(res1,nb.clust=7,kk=100,consol=FALSE,graph=FALSE)
+clust_7 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_7) 
+
+res.HCPC<-HCPC(res1,nb.clust=6,kk=100,consol=FALSE,graph=FALSE)
+clust_6 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_6) 
+
+res.HCPC<-HCPC(res1,nb.clust=9,kk=100,consol=FALSE,graph=FALSE)
+clust_9 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_9)
+
+res.HCPC<-HCPC(res1,nb.clust=10,kk=100,consol=FALSE,graph=FALSE)
+clust_10 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_10)
+
+res.HCPC<-HCPC(res1,nb.clust=11,kk=100,consol=FALSE,graph=FALSE)
+clust_11 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_11)
+
+res.HCPC<-HCPC(res1,nb.clust=12,kk=100,consol=FALSE,graph=FALSE)
+clust_12 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_12)
+
+res.HCPC<-HCPC(res1,nb.clust=13,kk=100,consol=FALSE,graph=FALSE)
+clust_13 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_13)
+
+res.HCPC<-HCPC(res1,nb.clust=14,kk=100,consol=FALSE,graph=FALSE)
+clust_14 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_14)
+
+res.HCPC<-HCPC(res1,nb.clust=15,kk=100,consol=FALSE,graph=FALSE)
+clust_15 <- res.HCPC$data.clust[,17] 
+indiv_acm1 <- cbind(indiv_acm1, clust_15)
+
+
+```
+
+
+
+```{r}
+indiv_test <- indiv_acm1 %>% select(clust_6, clust_7, clust_8, clust_9, clust_10, clust_11, clust_12, clust_13, clust_14, clust_15, sexee_rec, agenq, group1_rec, origine_tous_g2_rec, l_immi_rec)
+```
+
+
+```{r}
+
+
+ggsurvey(indiv_acm1) +
+  aes(x = clust_14, fill = group1_rec) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  coord_flip() +
+  theme_minimal()
+```
 
 
 ## ACM que sur immigrés
