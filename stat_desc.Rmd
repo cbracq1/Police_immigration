@@ -47,7 +47,6 @@ stable <- svytable(~i_cnfpol_rec + group1_rec, indiv_pd)
 ```{r}
 
 
-
 ggsurvey(indiv_pd, aes(x = as.factor(group1_code), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
   geom_bar(stat = "identity")
 
@@ -76,7 +75,7 @@ La durée de séjour dans le pays de résidence a-t-elle une influence sur
 la confiance envers la police ?
 
 ```{r, recodage durée}
-# A passer dans la partie base si ça te va Julien (après l'avoir nettoyée des doubles code rec), à utiliser pour les graphes en dessous
+
 indiv <- indiv %>% 
   mutate(durar2_tous = case_when(group1_rec=="Immigré (né étranger à l'étranger y compris réintégrés)"|group1_rec=="Originaire de l'Outre-mer"~durar2,
                                  TRUE~agenq))
@@ -84,10 +83,6 @@ indiv <- indiv %>%
 indiv <- indiv %>% 
   mutate(durtotfrm_tous = case_when(group1_rec=="Immigré (né étranger à l'étranger y compris réintégrés)"|group1_rec=="Originaire de l'Outre-mer"~durtotfrm,
                                  TRUE~agenq))
-```
-
-
-```{r}
 
 coloration = c("red","orange","purple","blue","green")
 group_un = c("G1_I","G2_I","G1_OM","G2_OM","Autre")
@@ -106,7 +101,7 @@ for (i in 1:5){ #Pour chaque groupe : traçons une courbe confiance envers la po
   X = 1:100
   Y = c()
   for (x in X){
-    datax = filter(data,durar2==x & data$i_cnfpol_rec != "Refus ou ne sait pas")
+    datax = filter(data,durar2_tous==x & data$i_cnfpol_rec != "Refus ou ne sait pas")
     datax_obj = filter(datax,i_cnfpol_rec == "Tout à fait confiance en la police")
  
     n_tot = sum(datax$poidsi)

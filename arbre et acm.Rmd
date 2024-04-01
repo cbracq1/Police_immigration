@@ -29,10 +29,11 @@ library(survey)
 library(arrow)
 library(ggplot2)
 library(questionr)
-install.packages("rpart") #pour l'arbre de décision
+#install.packages("rpart") #pour l'arbre de décision
 library(rpart)
-install.packages("rpart.plot")
+#install.packages("rpart.plot")
 library(rpart.plot)
+library(forcats)
 ```
 
 ```{r base, include = FALSE}
@@ -59,18 +60,30 @@ Nous allons a minima transformer notre label en variable binaire = 1(i_cnfpol_re
 
 indiv["i_cnfpol_1"] = (indiv$i_cnfpol == 1)*1
 
-data = select(indiv,c(i_cnfpol_1,agenq, durar2, group1_code,origine_tous_g2_class,i_contri_rec,l_quart_secu_rec,l_immi_code,qpv_i,a_rquart_code))
-
-
-fit <- rpart(i_cnfpol_1~group1_code + durar2, data = data, method = 'class')
-rpart.plot(fit, extra = 106)
+#data = select(indiv,c(i_cnfpol_1,agenq, durar2, group1_code,origine_tous_g2_cont,i_contri_rec,l_quart_secu_rec,l_immi_code,qpv_i,a_rquart_code))
+data = select(indiv,c(i_cnfpol_1,agenq, durar2,i_contri_rec,l_quart_secu_rec,l_immi_code,qpv_i,a_rquart_code))
 
 
 
+fit <- rpart(i_cnfpol_1~., data = data, method = 'anova')
+rpart.plot(fit, type = 2, extra = 1)
 
+
+prp(fit,extra=1)
 
 
 ```
+
+
+```{r base, include = FALSE}
+
+write_parquet(indiv,'C:/Users/3e3gr/OneDrive/Bureau/indiv.parquet')
+
+```
+
+
+
+
 
 
 

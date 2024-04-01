@@ -30,6 +30,8 @@ if (!exists("indiv")) {
 # moins pas coché un truc positif)
 # soit on veut créer une variable par modalité
 
+dimension = dim(indiv)
+
 
 ## Recodage de indiv$csnq_ego en indiv$csnq_ego_rec
 indiv$csnq_ego_rec <- as.character(indiv$csnq_ego)
@@ -412,6 +414,12 @@ indiv["i_control_rec_flag"] = res
 
 
 indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
+
+
+
+
+
+
 
 # 
 # pondation = function(var,var_contrainte,contrainte,size=dimension[1]){
