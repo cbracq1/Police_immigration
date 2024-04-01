@@ -155,3 +155,22 @@ explor(res)
 
 ```
 
+### Code mémoire
+```{r}
+acm <- indiv_dist %>% select(s_medeciq_a, s_medeciq_b, s_medeciq_c, s_medeciq_e, s_medeciq_f, s_etat_rec, s_medeciq_g, s_ren_queren_spe, s_ren_queren_gen, s_ren_queren_dent, s_ren_queren_medoc, s_ren_queren_lun, s_ren_queren_analyses, s_ren_queren_imagerie,  s_rec_ren_gen, s_rec_ren_spe, s_renonc_acm, s_medeciq_acm, s_ren_pqren_cout, s_ren_pqren_attente, s_ren_pqren_qui, s_ren_pqren_papier, s_ren_pqren_peur, s_ren_pqren_tps_loin,l_immi, group1, origine_tous_g2, sexee, csnq_ego, s_secuq, s_secuq_refus, dureeorigine,  s_traite, s_traite_peau,  s_maladi, s_limite, s_medeciq_d, frott_ap_25, agenq, durtotfrm, imc,ident_fa, poidsi) %>% data.frame() %>% 
+  filter(!is.na(s_medeciq_a)&!is.na(s_medeciq_b)&!is.na(s_medeciq_c)&!is.na(s_medeciq_e)&!is.na(s_medeciq_f))
+
+#, matches("^iris_pct_im\\w*$"), matches("^dist_min\\w*$"), matches("^com_apl_\\w*$"),  matches("^lib_dist_min\\w*$")
+rownames(acm) <- paste(acm$ident_fa)
+# acm$s_renonc <- acm$s_renonc %>%
+#   fct_recode(
+#     "A renoncé à des soins" = "Oui",
+#     "N'a pas renoncé à des soins" = "Non",
+#     NULL = "Refus (ne pas lire)",
+#     NULL = "NSP (ne pas lire)"
+#   )
+acm_poids <- acm %>% select(-ident_fa) 
+# %>% na.omit()
+acm <- acm_poids %>% select(-poidsi)
+```
+

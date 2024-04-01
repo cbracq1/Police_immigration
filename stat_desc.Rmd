@@ -45,16 +45,11 @@ stable <- svytable(~i_cnfpol_rec + group1_rec, indiv_pd)
 ```
 
 ```{r}
-
-
-
 ggsurvey(indiv_pd, aes(x = as.factor(group1_code), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
   geom_bar(stat = "identity")
 
 #ggsurvey(indiv_pd, aes(x = as.factor(group1_rec), y = as.factor(i_cnfpol_rec), fill = as.factor(i_cnfpol_rec)))+
 #  geom_bar(stat = "identity")
-
-
 
 
 ```
