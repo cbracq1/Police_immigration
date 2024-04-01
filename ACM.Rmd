@@ -64,11 +64,18 @@ On pourra en tenter une autre avec en actif les autres variables.
 indiv_acm2 <- indiv %>%
   filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
     filter(group1_code == "G1_I") %>% 
-  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, durtotfrm, durar2, agenq)  #, durtotfrm, durar2, agenq
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, sexee_rec, csnq_ego_rec, durtotfrm, durar2, agenq, ident, poidsi)  
+
+rownames(indiv_acm2) <- paste(indiv_acm2$ident)
+indiv_acm2_poids <- indiv_acm2 %>% select(-ident) 
+
+indiv_acm2 <- indiv_acm2_poids %>% select(-poidsi)
+
 ```
 
 ```{r}
-res <- MCA(indiv_acm2, quali.sup = c(4:8), quanti.sup = c(9:11))#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+res <- MCA(indiv_acm2, quali.sup = 4:10, quanti.sup = 11:13, row.w = indiv_acm2_poids$poidsi)
+#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
 ```
 
 ```{r}
