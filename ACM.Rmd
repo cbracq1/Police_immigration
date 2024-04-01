@@ -26,25 +26,59 @@ library(FactoMineR)
 library(factoextra)
 library(explor)
 library(Factoshiny)
+library(forcats)
 ```
 
 ## Préparation de la base
 
 ```{r}
-indiv_acm1 <- indiv %>%
-  select(i_cnfpol_rec, i_contri_rec, i_control_rec_a, i_control_rec_b, i_control_rec_c, i_control_rec_d, i_control_rec_e, i_control_rec_f, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, durtotfrm, durar2, agenq) 
+# indiv$agenq_cat <- cut(indiv$agenq, breaks = c())
 ```
 
-## Réalisation de l'ACM
+
+```{r}
+indiv_acm1 <- indiv %>%
+  filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec) #, durtotfrm, durar2, agenq
+```
+
+## Réalisation de l'ACM sur toute la pop
 On tente une première ACM avec en actif les variables sur la police. 
 
 ```{r}
-res <- MCA(indiv_acm1, quali.sup = c(8,13), quanti.sup = c(14, 16), weights(indiv$poidsi))#les supplémentaires sont aux rang 8à 16
+res <- MCA(indiv_acm1, quali.sup = c(4:8))#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+```
+
+
+```{r}
 explor(res)
-MCAshiny(res)# ça permet de voir le graphe tester des choses, produire un rapport automatique et tester la classification
+HCPCshiny(res)# ça permet de voir le graphe tester des choses, produire un rapport automatique et tester la classification
 ```
 
 On pourra en tenter une autre avec en actif les autres variables.
+
+
+## ACM que sur immigrés
+
+```{r}
+indiv_acm2 <- indiv %>%
+  filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
+    filter(group1_code == "G1_I") %>% 
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, durtotfrm, durar2, agenq)  #, durtotfrm, durar2, agenq
+```
+
+```{r}
+res <- MCA(indiv_acm2, quali.sup = c(4:8), quanti.sup = c(9:11))#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+```
+
+```{r}
+res.MCA<-MCA(X = indiv_acm2, quali.sup = c(4:8))
+res.HCPC<-HCPC(res.MCA,nb.clust=5,kk=100,consol=FALSE,graph=FALSE)
+plot.HCPC(res.HCPC,choice='tree',title='Arbre hiérarchique')
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+plot.HCPC(res.HCPC,choice='3D.map',ind.names=FALSE,centers.plot=FALSE,angle=60,title='Arbre hiérarchique sur le plan factoriel'
+```
+
 
 ### Cours ENS - sans utiliser Factoshiny
 Peut être utile si on veut pas passer par Shiny parce que la base est trop lourde

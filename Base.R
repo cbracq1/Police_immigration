@@ -372,6 +372,21 @@ indiv$a_rquart_code <- fct_recode(indiv$a_rquart_code,
 #Faisons de i_controla et i_controlb une seule est même variable :
 
 ## A : Ils vous ont expliqué ce qu'ils faisaient et pourquoi
+
+indiv <- indiv %>% 
+  mutate(d_lieudisagr_d_rec = case_when(d_lieudisagr_d == 1 ~ "Discrimination lors d'un contrôle de police",
+                                      d_lieudisagr_flag == 0 ~ "Pas d'expérience de discrimination",
+                                      d_lieudisagr_flag == -1 | d_lieudisagr_flag == -2 ~ NA_character_,
+                                     TRUE ~ "Discrimination autre que police"))
+indiv$d_lieudisagr_d_rec <- as.factor(indiv$d_lieudisagr_d_rec)
+
+indiv <- indiv %>% 
+  mutate(i_control_rec_a = case_when(i_controla_a == 1 | i_controlb_d==1 ~ "Ils vous ont expliqué ce qu'ils faisaient et pourquoi",
+                                     i_controla_flag == 0 ~ "Question non posée (filtre)",
+                                     i_controla_flag == -1 | i_controla_flag == -2 ~ "Refus ou ne sait pas",
+                                     TRUE ~ "Ils ne vous ont rien expliqué"))
+indiv$i_control_rec_a <- as.factor(indiv$i_control_rec_a)
+
 res = rep(0,dimension[1])
 res[which(indiv$i_controla_a == 1 | indiv$i_controlb_d == 1)] = 1
 indiv["i_control_rec_a"] = res
