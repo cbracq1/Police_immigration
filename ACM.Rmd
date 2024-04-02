@@ -42,34 +42,15 @@ indiv <- indiv %>%
 ```
 
 
-```{r}
-indiv_acm1 <- indiv %>%
-  filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
-  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, group1_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, compor_discri, sexee_rec, group1, csnq_ego_rec, durtotfrm, durar2, agenq, ident, poidsi) #, durtotfrm, durar2, agenq
-
-rownames(indiv_acm1) <- paste(indiv_acm1$ident)
-indiv_acm1_poids <- indiv_acm1 %>% select(-ident) 
-
-indiv_acm1 <- indiv_acm1_poids %>% select(-poidsi)
-
-
-indiv_acm1_poids <- indiv_acm1_poids%>% filter(indiv_acm1$group1 == "1")
-```
-
-```{r}
-indices_to_exclude <- which(indiv_acm1$group1 != "1")
-indices_to_include <- which(indiv_acm1$group1 == "1")
-indices <- c(indices_to_exclude, indices_to_include)
-```
-
-
 
 
 ## Réalisation de l'ACM sur toute la pop
 On tente une première ACM avec en actif les variables sur la police. 
 
+
+
 ```{r}
-res1 <- MCA(indiv_acm1, quali.sup = 4:13, quanti.sup = 14:16, row.w = indiv_acm1_poids$poidsi)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+res1 <- MCA(indiv_acm1, quali.sup = 4:13, quanti.sup = 14:16, ind.sup= indices[1:16000], row.w = indiv_acm1_poids$poidsi)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
 
 ```
 
@@ -84,42 +65,62 @@ res.HCPC<-HCPC(res1,nb.clust=8,kk=100,consol=FALSE,graph=FALSE)
 res.HCPC$data.clust # contient la classe pour chaque individu
 clust_8 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_8) 
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=7,kk=100,consol=FALSE,graph=FALSE)
 clust_7 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_7) 
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=6,kk=100,consol=FALSE,graph=FALSE)
 clust_6 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_6) 
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=9,kk=100,consol=FALSE,graph=FALSE)
 clust_9 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_9)
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=10,kk=100,consol=FALSE,graph=FALSE)
 clust_10 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_10)
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=11,kk=100,consol=FALSE,graph=FALSE)
 clust_11 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_11)
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=12,kk=100,consol=FALSE,graph=FALSE)
 clust_12 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_12)
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=13,kk=100,consol=FALSE,graph=FALSE)
 clust_13 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_13)
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=14,kk=100,consol=FALSE,graph=FALSE)
 clust_14 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_14)
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 res.HCPC<-HCPC(res1,nb.clust=15,kk=100,consol=FALSE,graph=FALSE)
 clust_15 <- res.HCPC$data.clust[,17] 
 indiv_acm1 <- cbind(indiv_acm1, clust_15)
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+
 
 
 ```
@@ -132,9 +133,10 @@ indiv_test <- indiv_acm1 %>% select(clust_6, clust_7, clust_8, clust_9, clust_10
 
 
 ```{r}
+indiv_acm1_pd <- svydesign(ids = indiv_acm1$ident, data = indiv_acm1, weights = indiv_acm1$poidsi)
 
 
-ggsurvey(indiv_acm1) +
+ggsurvey(indiv_acm1_pd) +
   aes(x = clust_14, fill = group1_rec) +
   geom_bar(position = "fill") +
   scale_fill_hue(direction = 1) +
@@ -142,6 +144,14 @@ ggsurvey(indiv_acm1) +
   theme_minimal()
 ```
 
+
+
+
+```{r}
+barplot(res.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
+        col="lightblue",border = "grey", axes = TRUE)
+# + geom_vline(xintercept = factor(c(5, 7, 10, 14, 15)), linetype = "dashed", color = "black")
+```
 
 ## ACM que sur immigrés
 
@@ -189,8 +199,34 @@ hommes, Afrique guinéenne et centrale, sécurité mauvaise, ségrégation QPV
 Classe 6 : Plus de 5, pas confiance
 Afrique sahélienne ou autres pays d'Afrique
 
+## Tentative individus supp : échec
 
-### Cours ENS - sans utiliser Factoshiny
+## ACM avec supp en deux fois
+
+
+```{r}
+indiv_acm_immigreG2 <- indiv %>%
+  filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, group1_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, compor_discri, sexee_rec, group1, csnq_ego_rec, durtotfrm, durar2, agenq, ident, poidsi) %>%  #, durtotfrm, durar2, agenq
+  filter(group1 %in% c(1, 3))
+
+rownames(indiv_acm_immigreG2) <- paste(indiv_acm_immigreG2$ident)
+indiv_acm_immigreG2_poids <- indiv_acm_immigreG2 %>% select(-ident) 
+
+indiv_acm_immigreG2 <- indiv_acm_immigreG2_poids %>% select(-poidsi)
+
+
+indiv_acm_immigreG2_poids <- indiv_acm_immigreG2_poids%>% filter(indiv_acm_immigreG2$group1 == "1")
+```
+
+
+
+```{r}
+res1 <- MCA(indiv_acm_immigreG2, quali.sup = 4:13, quanti.sup = 14:16, ind.sup= indices[1:8092], row.w = indiv_acm_immigreG2_poids$poidsi)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+
+```
+
+## Cours ENS - sans utiliser Factoshiny
 Peut être utile si on veut pas passer par Shiny parce que la base est trop lourde
 ```{r, include = FALSE}
 ### ACM ---------
@@ -265,7 +301,7 @@ explor(res)
 
 ```
 
-### Code mémoire
+## Code mémoire
 ```{r}
 acm <- indiv_dist %>% select(s_medeciq_a, s_medeciq_b, s_medeciq_c, s_medeciq_e, s_medeciq_f, s_etat_rec, s_medeciq_g, s_ren_queren_spe, s_ren_queren_gen, s_ren_queren_dent, s_ren_queren_medoc, s_ren_queren_lun, s_ren_queren_analyses, s_ren_queren_imagerie,  s_rec_ren_gen, s_rec_ren_spe, s_renonc_acm, s_medeciq_acm, s_ren_pqren_cout, s_ren_pqren_attente, s_ren_pqren_qui, s_ren_pqren_papier, s_ren_pqren_peur, s_ren_pqren_tps_loin,l_immi, group1, origine_tous_g2, sexee, csnq_ego, s_secuq, s_secuq_refus, dureeorigine,  s_traite, s_traite_peau,  s_maladi, s_limite, s_medeciq_d, frott_ap_25, agenq, durtotfrm, imc,ident_fa, poidsi) %>% data.frame() %>% 
   filter(!is.na(s_medeciq_a)&!is.na(s_medeciq_b)&!is.na(s_medeciq_c)&!is.na(s_medeciq_e)&!is.na(s_medeciq_f))
