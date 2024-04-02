@@ -1,0 +1,239 @@
+---
+title: "recours_origine"
+author: "Clémence Bracq"
+date: "2024-03-28"
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+
+```{r, echo = FALSE}
+ggsurvey(indiv_graphe_pd) +
+  aes(x = originegeo_rec, fill = frott_ap_25) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Dans les 3 dernières années..."
+  ) +
+  coord_flip() +
+    theme(     legend.position = "bottom",  legend.box = "horizontal"   ) +
+  theme_minimal()
+```
+
+
+```{r, echo = FALSE}
+indiv_femme <- indiv %>% filter(sexee=="Féminin")
+indiv_f_pd <-svydesign(ids = indiv_femme$ident_fa, data = indiv_femme, weights = indiv_femme$poidsi)
+
+ggsurvey(indiv_f_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_d) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Recours au gynécologue"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+```{r, echo = FALSE}
+
+ggsurvey(indiv_graphe_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_d) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Recours au gynécologue pour les plus de 25 ans"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+```{r, echo = FALSE}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_g) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Pas de recours"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+```{r, echo = FALSE}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_a) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Recours au généraliste"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+
+```{r, echo = FALSE}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_b) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Recours au dentiste"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+
+```{r, echo = FALSE}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_c) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Recours à l'ophtalmologue"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+
+```{r, echo = FALSE}
+
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_e) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Recours au psychologue ou psychiatre"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+
+```{r, echo = FALSE}
+
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_medeciq_f) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Recours à un autre spécialiste"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+```{r}
+
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_traite) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Discrimination par personnel médical"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+
+```{r, echo = FALSE, fig.width=10}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_secuq) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Couverture sociale"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+```{r, echo  = FALSE}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_renonc) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Renoncement"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+
+```{r, echo = FALSE}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = s_etat) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Etat de santé perçu"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+```{r, echo =FALSE}
+ggsurvey(indiv_pd) +
+  aes(x = originegeo_rec, fill = agenq_cat) +
+  geom_bar(position = "fill") +
+  scale_fill_hue(direction = 1) +
+  labs(
+    x = NULL,
+    y = "Proportion",
+    fill = "Catégorie d'âge"
+  ) +
+  coord_flip() +
+  theme(legend.position = "bottom") +
+  theme_minimal()
+```
+
+
+
