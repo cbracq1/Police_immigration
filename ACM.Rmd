@@ -50,9 +50,19 @@ On tente une première ACM avec en actif les variables sur la police.
 
 
 ```{r}
-res1 <- MCA(indiv_acm1, quali.sup = 4:13, quanti.sup = 14:16, ind.sup= indices[1:16000], row.w = indiv_acm1_poids$poidsi)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
+res1 <- MCA(indiv_acm1, quali.sup = c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26), quanti.sup = 14:16, row.w = indiv_acm1_poids$poidsi)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
 
 ```
+
+```{r}
+res <- explor::prepare_results(res1)
+explor::MCA_var_plot(res, xax = 1, yax = 2, var_sup = TRUE, var_sup_choice = c("qpv_i_rec",
+    "compor_discri"), var_lab_min_contrib = 0, col_var = "Variable", symbol_var = "Type",
+    size_var = NULL, size_range = c(10, 300), labels_size = 10, point_size = 56,
+    transitions = TRUE, labels_positions = "auto", labels_prepend_var = FALSE,
+    xlim = c(-1.65, 7.15), ylim = c(-5.05, 3.74))
+```
+
 
 
 ```{r}
@@ -225,6 +235,7 @@ indiv_acm_immigreG2_poids <- indiv_acm_immigreG2_poids%>% filter(indiv_acm_immig
 res1 <- MCA(indiv_acm_immigreG2, quali.sup = 4:13, quanti.sup = 14:16, ind.sup= indices[1:8092], row.w = indiv_acm_immigreG2_poids$poidsi)#les supplémentaires sont aux rang 8à 16#quanti.sup = c(8, 11),
 
 ```
+
 
 ## Cours ENS - sans utiliser Factoshiny
 Peut être utile si on veut pas passer par Shiny parce que la base est trop lourde
