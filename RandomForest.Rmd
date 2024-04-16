@@ -1,0 +1,62 @@
+---
+title: "Random Forest"
+author: "Bracq, Raymond"
+date: "2024-04-16"
+output: html_document
+---
+
+
+```{r setup, include = FALSE}
+library(haven)#si t'as pas les packages il faut faire install.packages("nom du package") dans la console
+library(tidyverse)
+library(dplyr)
+library(labelled)
+library(survey)
+library(arrow)
+library(ggplot2)
+library(questionr)
+library(randomForest)
+```
+
+```{r setup, include=FALSE}
+source("Base.R")
+```
+
+```{r setup, include=FALSE}
+
+indiv_doi = read_parquet("C:/Users/3e3gr/OneDrive/Bureau/dataofinterest.parquet")
+
+liste_origine = unique(indiv_doi$origine_tous_g2_class)
+
+data = indiv_doi[c("agenq","durar2","sexee","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart")]
+target = indiv_doi$i_cnfpol_1
+
+rF=randomForest(x=data,y=target,ntree=500)
+
+```
+
+```{r setup, include=FALSE}
+
+prediction = (predict(rF,data)>0.5)*1
+
+pred1 = prediction[which(target==1)]
+pred0 = prediction[which(target==0)]
+
+print(sum(prediction == target)/length(target))
+print(sum(pred1 == 1)/sum(target==1))
+print(sum(pred0 == 0)/sum(target==0))
+
+
+
+
+```
+
+
+
+```{r setup, include=FALSE}
+
+importance(rF,type = 2)
+
+
+
+```
