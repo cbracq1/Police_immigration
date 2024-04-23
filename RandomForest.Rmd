@@ -29,11 +29,11 @@ source("Base.R")
 
 ```{r setup, include=FALSE}
 
-indiv_doi = read_parquet("C:/Users/3e3gr/OneDrive/Bureau/dataofinterest.parquet")
+indiv_doi = read_parquet("C:/Users/3e3gr/OneDrive/Bureau/dataofinterest2.parquet")
 poids <- indiv_doi$poidsi
 
 
-liste_origine = unique(indiv_doi$origine_tous_g2_class)
+
 
 dataX = indiv_doi %>% select(-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1","__index_level_0__"))
 target = indiv_doi$i_cnfpol_1
