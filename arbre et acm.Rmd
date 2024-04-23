@@ -77,6 +77,14 @@ prp(fit,extra=1)
 
 ```{r base, include = FALSE}
 
+indiv <- indiv %>% 
+  mutate(compor_discri = case_when(i_controla_a == 0 |i_controlb_d == 0|i_controla_f ==0|i_controlb_b == 0 ~ "Discrimination dans le comportement de la police par le négatif",
+        i_controla_b == 1 | i_controla_c ==1 | i_controla_d == 1 | i_controla_e ==1 | i_controlb_a ==1 | i_controlb_c == 1 | i_controlb_e ==1 | i_controlb_f==1 ~ "Discrimination dans le comportement de la police par le positif",
+        i_controlagr_flag %in% c(-1, -2) ~ "Refus ou ne sait pas",
+        i_controlagr_flag == 0 ~ "Pas de contrôle de police",
+                                   TRUE ~ "Pas de comportement discriminatoire lors du dernier contrôle"))
+
+
 write_parquet(indiv,'C:/Users/3e3gr/OneDrive/Bureau/indiv.parquet')
 
 ```
