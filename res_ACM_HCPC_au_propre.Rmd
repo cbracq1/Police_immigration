@@ -96,6 +96,11 @@ clust <- res.HCPC$data.clust[,15] # on ne conserve que la colonne contenant les 
 acm2_classe <- cbind(indiv_acm2_poids, clust)
 ```
 
+```{r}
+table(acm2_classe$clust)
+```
+
+
 ```{r, fig.height=12, echo = FALSE}
 library(GGally)
 ggtable(
@@ -154,6 +159,10 @@ clust_6 <- res1.HCPC$data.clust[,17]
 acm1_classe <- cbind(indiv_acm1_poids, clust_6) 
 ```
 
+```{r}
+table(acm1_classe$clust)
+```
+
 ```{r, fig.height=12, echo = FALSE}
 library(GGally)
 ggtable(
@@ -168,3 +177,70 @@ ggtable(
   labs(fill = "Résidus standardisés du Chi²") +
   theme(legend.position = "bottom")
 ```
+
+
+
+## Sans les immigrés
+
+
+```{r}
+indiv_acm3 <- indiv %>%
+  filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
+    filter(group1_code != "G1_I") %>% 
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, sexee_rec, csnq_ego_rec, compor_discri, group1, durtotfrm, durar2, agenq, ident, poidsi)  
+
+rownames(indiv_acm3) <- paste(indiv_acm3$ident)
+indiv_acm3_poids <- indiv_acm3 %>% select(-ident) 
+
+indiv_acm3 <- indiv_acm3_poids %>% select(-poidsi)
+```
+```{r, include = FALSE}
+res3 <- MCA(indiv_acm3, quali.sup = 4:12, quanti.sup = 13:15, row.w = indiv_acm3_poids$poidsi)
+```
+
+```{r, echo = FALSE}
+fviz_eig(res3)+ labs(title = "Histogramme des valeurs propres",
+         x = "Axes", y = "% d'inertie")
+```
+
+```{r, echo = FALSE}
+res3_explor <- explor::prepare_results(res3)
+explor::MCA_var_plot(res1_explor, xax = 1, yax = 2, var_sup = TRUE, var_sup_choice = c("qpv_i_rec",
+    "compor_discri"), var_lab_min_contrib = 0, col_var = "Variable", symbol_var = "Type",
+    size_var = NULL, size_range = c(10, 300), labels_size = 10, point_size = 56,
+    transitions = TRUE, labels_positions = "auto", labels_prepend_var = FALSE,
+    xlim = c(-1.65, 7.15), ylim = c(-5.05, 3.74))
+```
+
+## Juste Population maj
+
+```{r}
+indiv_acm4 <- indiv %>%
+  filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
+    filter(group1_code == "Autre") %>% 
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, sexee_rec, csnq_ego_rec, compor_discri, durtotfrm, durar2, agenq, ident, poidsi)  
+
+rownames(indiv_acm4) <- paste(indiv_acm4$ident)
+indiv_acm4_poids <- indiv_acm4 %>% select(-ident) 
+
+indiv_acm4 <- indiv_acm4_poids %>% select(-poidsi)
+```
+
+```{r, include = FALSE}
+res4 <- MCA(indiv_acm4, quali.sup = 4:11, quanti.sup = 12:14, row.w = indiv_acm4_poids$poidsi)
+```
+
+```{r, echo = FALSE}
+fviz_eig(res4)+ labs(title = "Histogramme des valeurs propres",
+         x = "Axes", y = "% d'inertie")
+```
+
+```{r, echo = FALSE}
+res4_explor <- explor::prepare_results(res4)
+explor::MCA_var_plot(res1_explor, xax = 1, yax = 2, var_sup = TRUE, var_sup_choice = c("qpv_i_rec",
+    "compor_discri"), var_lab_min_contrib = 0, col_var = "Variable", symbol_var = "Type",
+    size_var = NULL, size_range = c(10, 300), labels_size = 10, point_size = 56,
+    transitions = TRUE, labels_positions = "auto", labels_prepend_var = FALSE,
+    xlim = c(-1.65, 7.15), ylim = c(-5.05, 3.74))
+```
+## Pop maj + DROM et descendants
