@@ -3,11 +3,14 @@ title: "Random Forest"
 author: "Bracq, Raymond"
 date: "2024-04-16"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
-
 
 ```{r setup, include = FALSE}
 library(haven)#si t'as pas les packages il faut faire install.packages("nom du package") dans la console
+#install.packages('tidyverse')
 library(tidyverse)
 library(dplyr)
 library(labelled)
@@ -20,6 +23,8 @@ library(randomForest)
 
 ```{r setup, include=FALSE}
 source("Base.R")
+
+
 ```
 
 ```{r setup, include=FALSE}
@@ -27,9 +32,10 @@ source("Base.R")
 indiv_doi = read_parquet("C:/Users/3e3gr/OneDrive/Bureau/dataofinterest.parquet")
 poids <- indiv_doi$poidsi
 
+
 liste_origine = unique(indiv_doi$origine_tous_g2_class)
 
-dataX = indiv_doi[c("agenq","durar2","sexee","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart")]
+dataX = indiv_doi %>% select(-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1","__index_level_0__"))
 target = indiv_doi$i_cnfpol_1
 
 
@@ -38,9 +44,13 @@ rF=randomForest(x=dataX,y=target,ntree=1000,weights=indiv_doi$poidsi,importance=
 
 ```
 
+```{r stupe, include=FALSE}
+pr = predict(rF,dataX)
+```
+
 ```{r setup, include=FALSE}
 
-prediction = (predict(rF,dataX)>0.5)*1
+prediction = (pr>0.74)*1
 
 pred1 = prediction[which(target==1)]
 pred0 = prediction[which(target==0)]
@@ -49,11 +59,12 @@ print(sum(prediction == target)/length(target))
 print(sum(pred1 == 1)/sum(target==1))
 print(sum(pred0 == 0)/sum(target==0))
 
-
-
-
 ```
 
+Prediction totale = 0.8463
+
+Prediction sur les "1" = 0.9756
+Prediction sur les "0" = 0.4071
 
 
 ```{r setup, include=FALSE}
@@ -61,8 +72,72 @@ print(sum(pred0 == 0)/sum(target==0))
 # type=1 -> increasing mean of accuracy
 # type=2 -> increasing mean of node purity
 
-importance(rF)
+pertinence1 = importance(rF,type=1)
+pertinence2 = importance(rF,type=2)
+```
+
+Par ordre d'importance pour IncMSE (pour 500 arbres) :
+
+discri (79.76)
+i_contri (76.78)
+agenq (55.46)
+durar2 (64.02)
+l_immi (33.29)
+l_quart_secu (27.70)
+G1_I (30.89)
+qpv_i (23.71)
+G2_I (23.25)
 
 
+Par ordre d'importance pour NodesPurity :
+
+durar2 (478)
+agenq (464)
+l_immi (240)
+a_rquart (233)
+i_contri (197)
+l_quart_secu (117)
+discri (99.13)
+sexee (81.6)
+
+
+
+```{r setup, include=FALSE}
+dfp = data.frame(pertinence1,pertinence2)
+
+listvar = rownames(dfp)[dfp["X.IncMSE"]>20 | dfp["IncNodePurity"]>50]
+
+```
+
+```{r setup, include=FALSE}
+
+library(rpart)
+library(rpart.plot)
+fit <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.002))
+rpart.plot(fit, extra = 106)
+
+
+install.packages("visNetwork")
+library(visNetwork)
+install.packages("sparkline")
+library(sparkline)
+visTree(fit)
+
+
+```
+```{r stupe, include=FALSE}
+pr = predict(fit,dataX)
+```
+
+```{r setup, include=FALSE}
+
+prediction = (pr>0.3)*1
+
+pred1 = prediction[which(target==1)]
+pred0 = prediction[which(target==0)]
+
+print(sum(prediction == target)/length(target))
+print(sum(pred1 == 1)/sum(target==1))
+print(sum(pred0 == 0)/sum(target==0))
 
 ```
