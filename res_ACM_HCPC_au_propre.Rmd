@@ -1,0 +1,170 @@
+---
+title: "Résultats ACM et HCPC"
+author: "Bracq, Raymond"
+date: "23/04/2024"
+output:
+  html_notebook: 
+    encoding: UTF-8
+  pdf_document: default
+  html_document:
+    df_print: paged
+    encoding: UTF-8
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+
+# ACM et classification{.tabset .tabset-fade}
+
+## Sur les immigrés seulement
+
+### ACM
+```{r, include =FALSE}
+indiv_acm2 <- indiv %>%
+  filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
+    filter(group1_code == "G1_I") %>% 
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, sexee_rec, csnq_ego_rec, compor_discri, durtotfrm, durar2, agenq, ident, poidsi)  
+
+rownames(indiv_acm2) <- paste(indiv_acm2$ident)
+indiv_acm2_poids <- indiv_acm2 %>% select(-ident) 
+
+indiv_acm2 <- indiv_acm2_poids %>% select(-poidsi)
+```
+
+
+```{r, include =FALSE}
+res <- MCA(indiv_acm2, quali.sup = 4:11, quanti.sup = 12:14, row.w = indiv_acm2_poids$poidsi)
+
+```
+
+
+```{r, echo = FALSE}
+fviz_eig(res)+ labs(title = "Histogramme des valeurs propres",
+         x = "Axes", y = "% d'inertie")
+```
+
+```{r, echo = FALSE}
+res_explor <- explor::prepare_results(res)
+explor::MCA_var_plot(res_explor, xax = 1, yax = 2, var_sup = TRUE, var_sup_choice = c("qpv_i_rec",
+    "compor_discri"), var_lab_min_contrib = 0, col_var = "Variable", symbol_var = "Type",
+    size_var = NULL, size_range = c(10, 300), labels_size = 10, point_size = 56,
+    transitions = TRUE, labels_positions = "auto", labels_prepend_var = FALSE,
+    xlim = c(-1.65, 7.15), ylim = c(-5.05, 3.74))
+```
+
+### Classification
+
+```{r, include = FALSE}
+res.HCPC<-HCPC(res,nb.clust=6,consol=FALSE,graph=FALSE)
+```
+
+```{r, echo = FALSE}
+barplot(res1.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
+        col="lightblue",border = "grey", axes = TRUE)
+```
+
+```{r, echo = FALSE}
+plot.HCPC(res.HCPC,choice='tree',title='Arbre hiérarchique')
+plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+plot.HCPC(res.HCPC,choice='3D.map',ind.names=FALSE,centers.plot=FALSE,angle=60,title='Arbre hiérarchique sur le plan factoriel')
+```
+Description des classes :
+Classe 1 : Pas de discri, confiance dans la police, jamais contrôlé
+femmes, bonne sécurité, G1 Maroc Tunisie Algérie, Classe pop
+
+Classe 2 : Discri autre, plutôt confiance, jamais contrôlé
+femmes, chine, pas QPV, classes sup
+
+Classe 3 : Décla discri autre, contrôlé une fois
+hommes, discri police par compor
+
+Classe 4 : Discri autre, plutôt pas confiance, jamais contrôlé
+Mauvaise sécu de quartier, chine, femmes, QPV
+
+Classe 5 : Discri police, contrôle 2 à 5 fois, pas confiance
+hommes, Afrique guinéenne et centrale, sécurité mauvaise, ségrégation QPV
+
+Classe 6 : Plus de 5, pas confiance
+Afrique sahélienne ou autres pays d'Afrique
+
+
+```{r, include=FALSE}
+names(res.HCPC$data.clust) #15
+clust <- res.HCPC$data.clust[,15] # on ne conserve que la colonne contenant les classes
+
+acm2_classe <- cbind(indiv_acm2_poids, clust)
+```
+
+```{r, fig.height=12, echo = FALSE}
+library(GGally)
+ggtable(
+  acm2_classe, 
+  columnsX = "clust", 
+  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","origine_tous_g2_rec", "qpv_i_rec", "sexee_rec", "durtotfrm", "agenq"),
+  mapping = aes(weight = poidsi),
+  cells = "col.prop",
+  fill = "std.resid",
+  cardinality_threshold = 32
+) + 
+  labs(fill = "Résidus standardisés du Chi²") +
+  theme(legend.position = "bottom")
+```
+
+
+## Sur toute la population
+
+### ACM
+
+```{r, include = FALSE}
+res1 <- MCA(indiv_acm1, quali.sup = 4:13, quanti.sup = 14:16, row.w = indiv_acm1_poids$poidsi)
+```
+
+```{r, echo = FALSE}
+fviz_eig(res1)+ labs(title = "Histogramme des valeurs propres",
+         x = "Axes", y = "% d'inertie")
+```
+
+```{r, echo = FALSE}
+res1_explor <- explor::prepare_results(res1)
+explor::MCA_var_plot(res1_explor, xax = 1, yax = 2, var_sup = TRUE, var_sup_choice = c("qpv_i_rec",
+    "compor_discri"), var_lab_min_contrib = 0, col_var = "Variable", symbol_var = "Type",
+    size_var = NULL, size_range = c(10, 300), labels_size = 10, point_size = 56,
+    transitions = TRUE, labels_positions = "auto", labels_prepend_var = FALSE,
+    xlim = c(-1.65, 7.15), ylim = c(-5.05, 3.74))
+```
+
+### HCPC
+```{r, include = FALSE}
+res1.HCPC<-HCPC(res1,nb.clust=6,kk=100,consol=FALSE,graph=FALSE)
+```
+
+```{r, echo = FALSE}
+barplot(res1.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
+        col="lightblue",border = "grey", axes = TRUE) #+ geom_vline(xintercept = factor(c(5, 7, 10, 14, 15)), linetype = "dashed", color = "black")
+```
+
+```{r, echo = FALSE}
+plot.HCPC(res1.HCPC,choice='tree',title='Arbre hiérarchique')
+plot.HCPC(res1.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+plot.HCPC(res1.HCPC,choice='3D.map',ind.names=FALSE,centers.plot=FALSE,angle=60,title='Arbre hiérarchique sur le plan factoriel')
+```
+```{r,include=FALSE}
+clust_6 <- res1.HCPC$data.clust[,17] 
+acm1_classe <- cbind(indiv_acm1_poids, clust_6) 
+```
+
+```{r, fig.height=12, echo = FALSE}
+library(GGally)
+ggtable(
+  acm1_classe, 
+  columnsX = "clust_6", 
+  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","group1_rec", "origine_tous_g2_rec", "qpv_i_rec", "sexee_rec", "durtotfrm", "agenq"),
+  mapping = aes(weight = poidsi),
+  cells = "col.prop",
+  fill = "std.resid",
+  cardinality_threshold = 32
+) + 
+  labs(fill = "Résidus standardisés du Chi²") +
+  theme(legend.position = "bottom")
+```

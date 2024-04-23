@@ -159,8 +159,7 @@ ggsurvey(indiv_acm1_pd) +
 
 ```{r}
 barplot(res.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
-        col="lightblue",border = "grey", axes = TRUE)
-# + geom_vline(xintercept = factor(c(5, 7, 10, 14, 15)), linetype = "dashed", color = "black")
+        col="lightblue",border = "grey", axes = TRUE) #+ geom_vline(xintercept = factor(c(5, 7, 10, 14, 15)), linetype = "dashed", color = "black")
 ```
 
 ## ACM que sur immigrés
