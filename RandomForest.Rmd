@@ -25,19 +25,22 @@ source("Base.R")
 ```{r setup, include=FALSE}
 
 indiv_doi = read_parquet("C:/Users/3e3gr/OneDrive/Bureau/dataofinterest.parquet")
+poids <- indiv_doi$poidsi
 
 liste_origine = unique(indiv_doi$origine_tous_g2_class)
 
-data = indiv_doi[c("agenq","durar2","sexee","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart")]
+dataX = indiv_doi[c("agenq","durar2","sexee","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart")]
 target = indiv_doi$i_cnfpol_1
 
-rF=randomForest(x=data,y=target,ntree=500)
+
+rF=randomForest(x=dataX,y=target,ntree=1000,weights=indiv_doi$poidsi,importance=TRUE)
+
 
 ```
 
 ```{r setup, include=FALSE}
 
-prediction = (predict(rF,data)>0.5)*1
+prediction = (predict(rF,dataX)>0.5)*1
 
 pred1 = prediction[which(target==1)]
 pred0 = prediction[which(target==0)]
@@ -54,8 +57,11 @@ print(sum(pred0 == 0)/sum(target==0))
 
 
 ```{r setup, include=FALSE}
+#Rappel : 
+# type=1 -> increasing mean of accuracy
+# type=2 -> increasing mean of node purity
 
-importance(rF,type = 2)
+importance(rF)
 
 
 
