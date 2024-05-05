@@ -1,5 +1,8 @@
 # Base et recodage
 
+
+{
+
 if (!exists("indiv")) {
   #indiv <- read_sas("C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/SAS/indiv.sas7bdat",  catalog_file = "C:/Users/Utilisateur/Documents/GitHub/Police_immigration/TeO2/Doc/formats.sas7bcat")# ça c'est mon chemin, soit tu organises ton truc de la même manière comme ça ça marche pour nous deux soit il faut que tu fasses une autre commande
   indiv <- read_sas("C:/Users/3e3gr/OneDrive/Documents/ENSAE/3A-S2/PDSSS2/database en sas/TeO2/SAS/indiv.sas7bdat")
@@ -380,6 +383,8 @@ indiv <- indiv %>%
                                      TRUE ~ "Discrimination autre que police"))
 indiv$d_lieudisagr_d_rec <- as.factor(indiv$d_lieudisagr_d_rec)
 
+
+
 indiv <- indiv %>% 
   mutate(i_control_rec_a = case_when(i_controla_a == 1 | i_controlb_d==1 ~ "Ils vous ont expliqué ce qu'ils faisaient et pourquoi",
                                      i_controla_flag == 0 ~ "Question non posée (filtre)",
@@ -427,7 +432,7 @@ res[which(indiv$i_controla_flag == 1 | indiv$i_controlb_flag == 1)] = 1
 indiv["i_control_rec_flag"] = res
 
 
-
+##Indicateur de discriminaton par le positif/negatif
 indiv <- indiv %>% 
   mutate(compor_discri = case_when(i_controla_a == 0 |i_controlb_d == 0|i_controla_f ==0|i_controlb_b == 0 ~ "Discrimination dans le comportement de la police par le négatif",
                                    i_controla_b == 1 | i_controla_c ==1 | i_controla_d == 1 | i_controla_e ==1 | i_controlb_a ==1 | i_controlb_c == 1 | i_controlb_e ==1 | i_controlb_f==1 ~ "Discrimination dans le comportement de la police par le positif",
@@ -441,5 +446,5 @@ indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
 
 
 
-
+}
 

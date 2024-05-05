@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r libraries, include = FALSE}
 library(haven)
+library(tidyr)
 library(tidyverse)
 library(dplyr)
 library(labelled)
@@ -26,6 +27,10 @@ library(rpart)
 library(rpart.plot)
 library(forcats)
 library(randomForest)
+library(fastDummies)
+library(visNetwork)
+library(sparkline)
+
 ```
 
 ```{r base, include = FALSE}
@@ -35,31 +40,49 @@ source("Base.R")
 
 
 ```{r base, include = FALSE}
-#Définition de la variable-cible
-indiv["i_cnfpol_1"] = (indiv$i_cnfpol == 1)*1
-```
+#Définition de la variable-cible : avoir au moins plutot confiance en la police
+indiv["i_cnfpol_1"] = (indiv$i_cnfpol < 3)*1
 
 
-```{r base, include = FALSE}
-
-write_parquet(indiv,'C:/Users/3e3gr/OneDrive/Bureau/indiv.parquet')
+#write_parquet(indiv,'C:/Users/3e3gr/OneDrive/Bureau/indiv.parquet')
 
 ```
 
+```{r setup, include = FALSE}
+#Filtrage des "Refus" et autres "Ne sait pas"
+indiv <- indiv %>% filter(i_cnfpol < 8 & i_contri < 8 & l_quart_secu < 8 & l_immi < 8 & a_rquart < 8)
+
+indiv <- indiv %>% drop_na(d_lieudisagr_d_rec)
+
+```
+
+```{r setup, include = FALSE}
+#On s'occupe des durar
+
+durar = indiv$durar2
+age = indiv$agenq
+
+index_na = is.na(durar)
+
+durar[index_na] = age[index_na]
+
+indiv["durar2"] = durar
+
+```
 
 
+```{r setup, include = FALSE}
+indiv_doi = indiv %>% select(c("ident","origine_tous_g2_class","i_cnfpol_1","sexee","group1_code","agenq","durar2","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart","poidsi","discri","d_lieudisagr_d_rec","compor_discri"))
+
+indiv_doi <- dummy_cols(indiv_doi, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
+```
 
 
 
 ```{r setup, include=FALSE}
 
-indiv_doi = read_parquet("C:/Users/3e3gr/OneDrive/Bureau/dataofinterest2.parquet")
-poids <- indiv_doi$poidsi
 
-
-
-
-dataX = indiv_doi %>% select(-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1","__index_level_0__"))
+dataX = indiv_doi %>% select(-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1"))
 target = indiv_doi$i_cnfpol_1
 
 
@@ -68,7 +91,7 @@ rF=randomForest(x=dataX,y=target,ntree=1000,weights=indiv_doi$poidsi,importance=
 
 ```
 
-```{r stupe, include=FALSE}
+```{r setup, include=FALSE}
 pr = predict(rF,dataX)
 ```
 
@@ -134,34 +157,30 @@ listvar = rownames(dfp)[dfp["X.IncMSE"]>20 | dfp["IncNodePurity"]>50]
 ```
 
 ```{r setup, include=FALSE}
-
-library(rpart)
-library(rpart.plot)
-fit <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.002))
+fitree <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.002))
 rpart.plot(fit, extra = 106)
 
 
-install.packages("visNetwork")
-library(visNetwork)
-install.packages("sparkline")
-library(sparkline)
-visTree(fit)
-
-
+visTree(fitree)
 ```
+
 ```{r stupe, include=FALSE}
-pr = predict(fit,dataX)
+pr_tree = predict(fitree,dataX)
+
+dpr_tree = data.frame(pr_tree)
+
+
 ```
 
 ```{r setup, include=FALSE}
 
-prediction = (pr>0.3)*1
+prediction_tree = (dpr_tree$X1>0.79)*1
 
-pred1 = prediction[which(target==1)]
-pred0 = prediction[which(target==0)]
+pred_tree1 = prediction_tree[which(target==1)]
+pred_tree0 = prediction_tree[which(target==0)]
 
-print(sum(prediction == target)/length(target))
-print(sum(pred1 == 1)/sum(target==1))
-print(sum(pred0 == 0)/sum(target==0))
+print(sum(prediction_tree == target)/length(target))
+print(sum(pred_tree1 == 1)/sum(target==1))
+print(sum(pred_tree0 == 0)/sum(target==0))
 
 ```
