@@ -1,0 +1,54 @@
+---
+title: "Bradford"
+author: "Bracq, Raymond"
+date: "05/05/2024"
+output:
+  html_notebook: 
+    encoding: UTF-8
+  pdf_document: default
+  html_document:
+    df_print: paged
+    encoding: UTF-8
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+# Bradford {.tabset .tabset-fade}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include = FALSE}
+library(haven)#si t'as pas les packages il faut faire install.packages("nom du package") dans la console
+library(tidyverse)
+library(dplyr)
+library(labelled)
+library(survey)
+library(arrow)
+library(ggplot2)
+library(questionr)
+```
+
+```{r base, include = FALSE}
+source("Base.R")
+```
+
+### Stats desc sur discris
+
+
+```{r}
+cprop(svytable(~ origine_tous_g2_rec + d_lieudisagr_d_rec, indiv_immig_pd))
+```
+On peut prendre Algérie, Maroc/TUnisie, Afique sahélienne, afrique guinéenne/centrale et autres pays d'Afrique
+```{r}
+indiv <- indiv %>%
+  mutate(agenq_cat = ntile(agenq, 5)) %>% 
+  mutate(duretotfrm_cat = ntile(durtotfrm, 5))
+indiv_pd <- svydesign(ids = indiv$ident, data = indiv, weights = indiv$poidsi)
+
+
+
+```
+
