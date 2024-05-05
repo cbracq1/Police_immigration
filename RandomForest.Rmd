@@ -8,9 +8,13 @@ editor_options:
     wrap: 72
 ---
 
-```{r setup, include = FALSE}
-library(haven)#si t'as pas les packages il faut faire install.packages("nom du package") dans la console
-#install.packages('tidyverse')
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include = FALSE}
+library(haven)
 library(tidyverse)
 library(dplyr)
 library(labelled)
@@ -18,14 +22,34 @@ library(survey)
 library(arrow)
 library(ggplot2)
 library(questionr)
+library(rpart)
+library(rpart.plot)
+library(forcats)
 library(randomForest)
 ```
 
-```{r setup, include=FALSE}
+```{r base, include = FALSE}
 source("Base.R")
+```
 
+
+
+```{r base, include = FALSE}
+#Définition de la variable-cible
+indiv["i_cnfpol_1"] = (indiv$i_cnfpol == 1)*1
+```
+
+
+```{r base, include = FALSE}
+
+write_parquet(indiv,'C:/Users/3e3gr/OneDrive/Bureau/indiv.parquet')
 
 ```
+
+
+
+
+
 
 ```{r setup, include=FALSE}
 
