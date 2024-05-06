@@ -224,7 +224,223 @@ ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = qpv_i_rec)) +
 ```
 Il y a enfin une très forte prévalence à ne pas avoir confiance en la police lorsque nous vivons en QPV parmi les descendants. Ici le fait de vivre en QPV est donc un fort facteur sur l'explication de la conifance envers la police.
 
-###
+###b) Relation au sein du quartier
+
+```{r}
+
+# Présence d'immigré dans le quartier (pop = metro)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_immi_rec, indiv_metro[which(indiv_metro$variables$l_immi_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = l_immi_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~l_immi_rec+taux_confiance, indiv_metro[which(indiv_metro$variables$l_immi_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_immi_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = l_immi_rec)) +
+  geom_bar(stat="identity")
+
+
+```
+
+C'est encore moins clair.
+
+```{r}
+
+# Présence d'immigré dans le quartier (pop = immigré)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_immi_rec, indiv_immig[which(indiv_immig$variables$l_immi_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = l_immi_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~l_immi_rec+taux_confiance, indiv_immig[which(indiv_immig$variables$l_immi_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_immi_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = l_immi_rec)) +
+  geom_bar(stat="identity")
+
+
+```
+Même observation que pour les descendants mais en moins flagrant.
+
+
+```{r}
+
+# Présence d'immigré dans le quartier (pop = descendant)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_immi_rec, indiv_desce[which(indiv_desce$variables$l_immi_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = l_immi_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~l_immi_rec+taux_confiance, indiv_desce[which(indiv_desce$variables$l_immi_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_immi_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = l_immi_rec)) +
+  geom_bar(stat="identity")
+
+```
+
+Nous constatons chez les descendants que la présence d'immigrés dans le quartier de résidence et confiance en la police sont négativement corrélé : au plus il y a d'immigré dans son quartier, au moins nous avons confiance en la police lorsque nous descendons d'immigré. Nous nous doutons que cela s'explique par le fait qu'un quartier ayant une plus forte présence d'immigré serait aussi plus de fois fréquanté par la police. L'intéraction avec la police serait alors à l'origine dans la regression avec la confiance. C'est ce que nous verifierons tout à l'heure.
+
+```{r}
+
+# Relation entre part d'immigré dans le quartier et nombre de controle
+
+tb1 <- data.frame(cprop(svytable(~l_immi_rec+i_contri_rec, indiv_desce[which(indiv_desce$variables$l_immi_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_immi_rec != "Total")
+
+ggplot(tb2, aes(x = i_contri_rec, y= Freq, fill = l_immi_rec)) +
+  geom_bar(stat="identity")
+
+
+```
+
+Ca semble correspondre mais c'est alors la troisième partie qui nous interessera.
+
+
+```{r}
+
+# Sentiment de sécurité dans le quartier (pop = metro)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_quart_secu_rec, indiv_metro[which(indiv_metro$variables$l_quart_secu_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = l_quart_secu_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~l_quart_secu_rec+taux_confiance, indiv_metro[which(indiv_metro$variables$l_quart_secu_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_quart_secu_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = l_quart_secu_rec)) +
+  geom_bar(stat="identity")
+
+
+```
+Parmi les populations nées en France métropolitaine, nous accordons moins de confiance à la police que nous ne nous sentons moins en sécurité dans notre quartier. Ainsi, nous pourrions accorder notre sentiment de sécurité selon la confiance que l'on accorde à la police : si nous avons confiance en la police alors elle sera là pour nous protéger, nous nous sentons en sécurité et inversement. Ou alors c'est parce que la police assure notre sécurité que nous avons confiance.
+
+Se serez donc soit une défaillance de la police soit un manque de foi en notre quartier que nous interprétons comme une défaillance de la police (nous ne pensons pas quelle soit capable d'assurer notre sécurité alors même que nous nous sentons en danger) qui nous conduirez à ne pas avoir confiance en elle.
+
+
+```{r}
+
+# Sentiment de sécurité dans le quartier (pop = immigré)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_quart_secu_rec, indiv_immig[which(indiv_immig$variables$l_quart_secu_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = l_quart_secu_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~l_quart_secu_rec+taux_confiance, indiv_immig[which(indiv_immig$variables$l_quart_secu_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_quart_secu_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = l_quart_secu_rec)) +
+  geom_bar(stat="identity")
+
+```
+Parmi les immigrés, nous remarquons seulement que les personnes qui n'ont pas confiance en la police ne se sentent pas en sécurité dans leur quartier. Ce serait donc la police qui serait à l'origine de la confiance que nous pouvons avoir dans notre quartier. Surement en proxy de la présence policière.
+
+
+```{r}
+
+# Sentiment de sécurité dans le quartier (pop = descendants)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+l_quart_secu_rec, indiv_desce[which(indiv_desce$variables$l_quart_secu_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = l_quart_secu_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~l_quart_secu_rec+taux_confiance, indiv_desce[which(indiv_desce$variables$l_quart_secu_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_quart_secu_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = l_quart_secu_rec)) +
+  geom_bar(stat="identity")
+
+```
+Nous retrouvons chez les descendants une forte corrélation entre sécurité du quartier en confiance enl la police : la police serait à l'origine de cette insécurité par présence ou incompétence. Nous confirmerons avec la troisième partie ces hypothèses.
+
+
+```{r}
+
+# Part de ses amis au sein du quartier (pop = metro)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+a_rquart_code, indiv_metro[which(indiv_metro$variables$a_rquart_code != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = a_rquart_code, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~a_rquart_code+taux_confiance, indiv_metro[which(indiv_metro$variables$a_rquart_code != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,a_rquart_code != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = a_rquart_code)) +
+  geom_bar(stat="identity")
+
+```
+
+Il ne semble pas qu'il n'y pas ait de relation entre confiance en la police et la part de ses amis dans le quartier de résidence.
+
+```{r}
+
+# Part de ses amis au sein du quartier (pop = immigré)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+a_rquart_code, indiv_immig[which(indiv_immig$variables$a_rquart_code != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = a_rquart_code, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~a_rquart_code+taux_confiance, indiv_immig[which(indiv_immig$variables$a_rquart_code != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,a_rquart_code != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = a_rquart_code)) +
+  geom_bar(stat="identity")
+
+```
+Pas de relation.
+
+```{r}
+
+# Part de ses amis au sein du quartier (pop = descendant)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+a_rquart_code, indiv_desce[which(indiv_desce$variables$a_rquart_code != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = a_rquart_code, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~a_rquart_code+taux_confiance, indiv_desce[which(indiv_desce$variables$a_rquart_code != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,a_rquart_code != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = a_rquart_code)) +
+  geom_bar(stat="identity")
+
+```
+Pas de relation.
+
+
+###c) Relation avec la police et autres
+
+
+
+
+
 
 
 ## Confiance en la police
