@@ -93,9 +93,7 @@ rF=randomForest(x=dataX,y=target,ntree=1000,weights=indiv_doi$poidsi,importance=
 
 ```{r setup, include=FALSE}
 pr = predict(rF,dataX)
-```
 
-```{r setup, include=FALSE}
 
 prediction = (pr>0.74)*1
 
@@ -108,10 +106,10 @@ print(sum(pred0 == 0)/sum(target==0))
 
 ```
 
-Prediction totale = 0.8463
+Prediction totale = 0.8145
 
-Prediction sur les "1" = 0.9756
-Prediction sur les "0" = 0.4071
+Prediction sur les "1" = 0.8213
+Prediction sur les "0" = 0.7915
 
 
 ```{r setup, include=FALSE}
@@ -121,35 +119,8 @@ Prediction sur les "0" = 0.4071
 
 pertinence1 = importance(rF,type=1)
 pertinence2 = importance(rF,type=2)
-```
-
-Par ordre d'importance pour IncMSE (pour 500 arbres) :
-
-discri (79.76)
-i_contri (76.78)
-agenq (55.46)
-durar2 (64.02)
-l_immi (33.29)
-l_quart_secu (27.70)
-G1_I (30.89)
-qpv_i (23.71)
-G2_I (23.25)
 
 
-Par ordre d'importance pour NodesPurity :
-
-durar2 (478)
-agenq (464)
-l_immi (240)
-a_rquart (233)
-i_contri (197)
-l_quart_secu (117)
-discri (99.13)
-sexee (81.6)
-
-
-
-```{r setup, include=FALSE}
 dfp = data.frame(pertinence1,pertinence2)
 
 listvar = rownames(dfp)[dfp["X.IncMSE"]>20 | dfp["IncNodePurity"]>50]
@@ -169,10 +140,6 @@ pr_tree = predict(fitree,dataX)
 
 dpr_tree = data.frame(pr_tree)
 
-
-```
-
-```{r setup, include=FALSE}
 
 prediction_tree = (dpr_tree$X1>0.79)*1
 
