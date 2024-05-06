@@ -437,10 +437,214 @@ Pas de relation.
 
 ###c) Relation avec la police et autres
 
+```{r}
+
+# Fréquence des contrôles de police (pop = métro)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+i_contri_rec, indiv_metro[which(indiv_metro$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = i_contri_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
 
 
+tb1 <- data.frame(cprop(svytable(~i_contri_rec+taux_confiance, indiv_metro[which(indiv_metro$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_contri_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = i_contri_rec)) +
+  geom_bar(stat="identity")
+
+```
+
+Nous remarquons que les trois populations perdent confiance en la police lorsqu'ils sont souvent controlés ET que les personnes qui sont le plus controlé sont aussi celle qui ont le moins confiance en la police. Ces indications nous semble dire que c'est la présence policière qui mènent à un sentiment d'insécurité et non son inefficacité pour la réguler. C'est la police qui est perçue comme danger lorsque nous la cotoyons fréquemment. Une dernière comparaison entre fréquence des controles et part d'immigré nous permettra détailler cette hypothèse.
 
 
+```{r}
+
+# Fréquence des contrôles de police (pop = immigré)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+i_contri_rec, indiv_immig[which(indiv_immig$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = i_contri_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~i_contri_rec+taux_confiance, indiv_immig[which(indiv_immig$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_contri_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = i_contri_rec)) +
+  geom_bar(stat="identity")
+
+```
+Idem
+
+```{r}
+
+# Fréquence des contrôles de police (pop = descendant)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+i_contri_rec, indiv_desce[which(indiv_desce$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = i_contri_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~i_contri_rec+taux_confiance, indiv_desce[which(indiv_desce$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_contri_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = i_contri_rec)) +
+  geom_bar(stat="identity")
+
+```
+Idem
+
+```{r}
+
+# Fréquence des contrôles de police x Part d'immigrés dans le quartier
+
+tb1 <- data.frame(cprop(svytable(~l_immi_code+i_contri_rec, indiv_metro[which(indiv_metro$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,l_immi_code != "Total")
+
+ggplot(tb2, aes(x = i_contri_rec, y= Freq, fill = l_immi_code)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~i_contri_rec+l_immi_code, indiv_metro[which(indiv_metro$variables$i_contri_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_contri_rec != "Total")
+
+ggplot(tb2, aes(x = l_immi_code, y= Freq, fill = i_contri_rec)) +
+  geom_bar(stat="identity")
+
+
+```
+Métro : Nous remarquons que la présence d'immigré favorise les chances d'être controlé au moins une fois.
+
+Immigrés : Pareil mais moins flagrant que Descendants
+
+Descendants : Nous constatons qu'il existe une légère prépondérance aux controles fréquent lorsqu'il y a une plus grande présence d'immigrés. En revanche, la part des individus ayant été controlé plus de 5 fois ont significativement plus d'immigré dans leur quartier.
+
+
+Il existerai donc bien une surrencontre policière lié à la surprésence d'immirgé dans son quartier, certainement dû à une surprésence même de la police dans ces quartiers.
+
+
+### d) Face à la discrimination
+
+```{r}
+
+# Discrimination par le comportement policier (pop = metro)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+compor_discri, indiv_metro[which(indiv_metro$variables$compor_discri != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = compor_discri, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~compor_discri+taux_confiance, indiv_metro[which(indiv_metro$variables$compor_discri != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,compor_discri != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = compor_discri)) +
+  geom_bar(stat="identity")
+
+```
+```{r}
+
+# Discrimination par le comportement policier (pop = immigré)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+compor_discri, indiv_immig[which(indiv_immig$variables$compor_discri != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = compor_discri, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~compor_discri+taux_confiance, indiv_immig[which(indiv_immig$variables$compor_discri != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,compor_discri != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = compor_discri)) +
+  geom_bar(stat="identity")
+
+```
+```{r}
+
+# Discrimination par le comportement policier
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+compor_discri, indiv_desce[which(indiv_desce$variables$compor_discri != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = compor_discri, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~compor_discri+taux_confiance, indiv_desce[which(indiv_desce$variables$compor_discri != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,compor_discri != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = compor_discri)) +
+  geom_bar(stat="identity")
+
+```
+Bon ben la discrimination dans le comportement policier réduit la confiance...
+
+```{r}
+
+# Discrimination policier ou non (pop = metro)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+d_lieudisagr_d_rec, indiv_metro[which(indiv_metro$variables$d_lieudisagr_d_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = d_lieudisagr_d_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~d_lieudisagr_d_rec+taux_confiance, indiv_metro[which(indiv_metro$variables$d_lieudisagr_d_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,d_lieudisagr_d_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = d_lieudisagr_d_rec)) +
+  geom_bar(stat="identity")
+
+```
+Nous remarquons dans la population métropolitaine que le fait de subir une discrimination par la police caractérise massivement le manque de confiance en elle. Le fait d'avoir subi des discriminations dans d'autres cadres favorisent légèrement cette tendance également.
+
+```{r}
+
+# Discrimination policier ou non (pop = immigrés)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+d_lieudisagr_d_rec, indiv_immig[which(indiv_immig$variables$d_lieudisagr_d_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = d_lieudisagr_d_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~d_lieudisagr_d_rec+taux_confiance, indiv_immig[which(indiv_immig$variables$d_lieudisagr_d_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,d_lieudisagr_d_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = d_lieudisagr_d_rec)) +
+  geom_bar(stat="identity")
+
+```
+Idem
+
+```{r}
+
+# Discrimination policier ou non (pop = descendants)
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+d_lieudisagr_d_rec, indiv_desce[which(indiv_desce$variables$d_lieudisagr_d_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = d_lieudisagr_d_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~d_lieudisagr_d_rec+taux_confiance, indiv_desce[which(indiv_desce$variables$d_lieudisagr_d_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,d_lieudisagr_d_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = d_lieudisagr_d_rec)) +
+  geom_bar(stat="identity")
+
+```
+Idem
 
 
 ## Confiance en la police
