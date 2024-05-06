@@ -502,7 +502,7 @@ ggtitle("Ils ont été brutaux")
 ```{r}
 
 
-df = indiv_pd[c("","i_control_rec_e","i_control_rec_f")]
+#df = indiv_pd[c("","i_control_rec_e","i_control_rec_f")]
 
 
 ```
