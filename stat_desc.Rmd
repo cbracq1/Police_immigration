@@ -35,6 +35,198 @@ library(questionr)
 source("Base.R")
 ```
 
+```{r}
+
+#Population immigrée
+indiv_immig = indiv_pd[which(indiv_pd$variables$group1_code=="G1_I")]
+
+#Population descendante d'immigrées
+indiv_desce = indiv_pd[which(indiv_pd$variables$group1_code=="G2_I")]
+
+
+#Population né en France métropolitaine
+indiv_metro = indiv_pd[which(indiv_pd$variables$group1_code=="Autre")]
+
+
+
+```
+
+
+## Caractérisation de la confiance en la police
+
+
+### a) Qui a confiance en la police
+
+```{r}
+
+# Etre immigré
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+group1_code, indiv_pd[which(indiv_pd$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = group1_code, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+```
+
+Nous constatons que les immigrés ont une confiance plus élevé en la police que les natifs de France métropolitaine. Ce qui est le point de départ de notre étude.
+
+```{r}
+
+# Age
+
+
+```
+
+```{r}
+
+# Durée de vie en France
+
+
+```
+
+```{r}
+
+# Origine (pop = Immigré)
+
+# QPV (pop = Ensemble)
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+origine_tous_g2_code, indiv_immig[which(indiv_immig$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = origine_tous_g2_code, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~origine_tous_g2_code+taux_confiance, indiv_immig[which(indiv_immig$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,origine_tous_g2_code != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = origine_tous_g2_code)) +
+  geom_bar(stat="identity")
+
+
+```
+Nous remarquons que parmis les personnes qui n'ont pas confiance en la police il y a :
+- plus d'Algérien
+- plus d'autres Africains 
+
+- moins de Marocain/Tunisien
+- moins d'Européen hors-UE
+
+
+
+```{r}
+
+# Origine (pop = Descendants)
+
+# QPV (pop = Ensemble)
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+origine_tous_g2_code, indiv_desce[which(indiv_desce$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = origine_tous_g2_code, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~origine_tous_g2_code+taux_confiance, indiv_desce[which(indiv_desce$variables$i_cnfpol_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,origine_tous_g2_code != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = origine_tous_g2_code)) +
+  geom_bar(stat="identity")
+
+
+```
+Nous remarquons que parmis les personnes qui n'ont pas confiance en la police il y a :
+- moins d'Asiatique
+- moins de Portugais
+- moins d'Espagnol/Italien
+- moins de Union Européen
+- moins d'européen hors UE
+- moins d'Asie du Sud-Est
+
+- plus d'Algérien
+- plus de Guinéen
+- plus de sahélien
+- plus de Marocain/Tunisien
+
+```{r}
+
+# QPV (pop = Ensemble)
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+qpv_i_rec, indiv_pd[which(indiv_pd$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = qpv_i_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~qpv_i_rec+taux_confiance, indiv_pd[which(indiv_pd$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,qpv_i_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = qpv_i_rec)) +
+  geom_bar(stat="identity")
+
+```
+
+Il y a une surreprésentation des personnes vivant en qpv parmis les personnes n'ayant PAS confiance en la police. Symétriquement, vivre en QPV prédispose à ne pas avoir confiance en la police. Pourtant, parmi les personnes qui ont confiance et qui vivent en qpv : il y a une plus grande confiance. Nous constatons très certainement dans les QPV la présence des immigrés et de leur descendants. Le fait de vivre en QPV n'a donc a priori pas d'influence clair sur la confiance en la police indépendamment des populations qui s'y trouvent.
+
+```{r}
+
+# QPV (pop = métro)
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+qpv_i_rec, indiv_metro[which(indiv_metro$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = qpv_i_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~qpv_i_rec+taux_confiance, indiv_metro[which(indiv_metro$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,qpv_i_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = qpv_i_rec)) +
+  geom_bar(stat="identity")
+
+```
+Même observation chez les métropolitains.
+
+```{r}
+
+# QPV (pop = immigré)
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+qpv_i_rec, indiv_immig[which(indiv_immig$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = qpv_i_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~qpv_i_rec+taux_confiance, indiv_immig[which(indiv_immig$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,qpv_i_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = qpv_i_rec)) +
+  geom_bar(stat="identity")
+
+```
+Nous observons sur les populations uniquement immigrés le même phénomène mais de façon plus marginale.
+
+
+```{r}
+
+# QPV (pop = descendants)
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_rec+qpv_i_rec, indiv_desce[which(indiv_desce$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_rec != "Total")
+
+ggplot(tb2, aes(x = qpv_i_rec, y= Freq, fill = i_cnfpol_rec)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~qpv_i_rec+taux_confiance, indiv_desce[which(indiv_desce$variables$qpv_i_rec != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,qpv_i_rec != "Total")
+
+ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = qpv_i_rec)) +
+  geom_bar(stat="identity")
+
+```
+Il y a enfin une très forte prévalence à ne pas avoir confiance en la police lorsque nous vivons en QPV parmi les descendants. Ici le fait de vivre en QPV est donc un fort facteur sur l'explication de la conifance envers la police.
+
+###
+
+
 ## Confiance en la police
 
 La variable d'intérêt est i_cnfpol : Avez-vous confiance dans les

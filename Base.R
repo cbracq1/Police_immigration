@@ -223,6 +223,44 @@ indiv$origine_tous_g2_rec <- fct_recode(indiv$origine_tous_g2_rec,
 )
 
 
+## Recodage de indiv$origine_tous_g2 en indiv$origine_tous_g2_code (lisible et petit)
+indiv$origine_tous_g2_code <- as.character(indiv$origine_tous_g2)
+indiv$origine_tous_g2_code <- fct_recode(indiv$origine_tous_g2_code,
+                                            "Sans" = "0",
+                                            "Hm" = "10",
+                                            "Hm" = "11",
+                                            "OM" = "20",
+                                            "OM" = "22",
+                                            "Alg" = "30",
+                                            "Alg" = "33",
+                                            "M/T" = "40",
+                                            "M/T" = "44",
+                                            "Sah" = "50",
+                                            "Sah" = "55",
+                                            "Gui" = "60",
+                                            "Gui" = "66",
+                                            "Afr" = "70",
+                                            "Afr" = "77",
+                                            "ASE" = "80",
+                                            "ASE" = "88",
+                                            "TMO" = "90",
+                                            "TMO" = "99",
+                                            "Chi" = "100",
+                                            "Chi" = "110",
+                                            "Asi" = "111",
+                                            "Por" = "120",
+                                            "Por" = "121",
+                                            "E-I" = "130",
+                                            "E-I" = "131",
+                                            "UE" = "140",
+                                            "UE" = "141",
+                                            "Eur" = "150",
+                                            "Eur" = "151",
+                                            "Pays" = "160",
+                                            "Pays" = "161"
+)
+
+
 
 ## Recodage de indiv$origine_tous_g2 en indiv$origine_tous_g2_class
 indiv$origine_tous_g2_class <- as.character(indiv$origine_tous_g2)
@@ -338,6 +376,8 @@ indiv$origine_tous_g2_corrupt <- fct_recode(indiv$origine_tous_g2_corrupt,
                                             "Descendants d'immigré(s) originaires d'autres pays" = "161"
 )
 
+
+
 ##############################################Recodage de lecture
 indiv$group1_code <- as.character(indiv$group1)
 indiv$group1_code <- fct_recode(indiv$group1_code,
@@ -439,6 +479,13 @@ indiv <- indiv %>%
                                    i_controlagr_flag %in% c(-1, -2) ~ "Refus ou ne sait pas",
                                    i_controlagr_flag == 0 ~ "Pas de contrôle de police",
                                    TRUE ~ "Pas de comportement discriminatoire lors du dernier contrôle"))
+
+indiv <- indiv %>% 
+  mutate(a_confiance = case_when(i_cnfpol < 3 ~ "Oui",
+                                   i_cnfpol == 3 | i_cnfpol == 4 ~ "Non",
+                                   i_cnfpol > 4 ~ "Refus ou ne sait pas"))
+
+indiv["taux_confiance"] = (indiv$i_cnfpol < 3)*1
 
 
 
