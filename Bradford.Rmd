@@ -28,6 +28,7 @@ library(labelled)
 library(survey)
 library(arrow)
 library(ggplot2)
+library(xtable)
 library(questionr)
 ```
 
@@ -39,7 +40,8 @@ source("Base.R")
 
 
 ```{r}
-cprop(svytable(~ origine_tous_g2_rec + d_lieudisagr_d_rec, indiv_immig_pd))
+tb <- cprop(svytable(~ origine_tous_g2_rec + d_lieudisagr_d_rec, indiv_immig_pd))
+xtable(tb)
 ```
 On peut prendre Algérie, Maroc/TUnisie, Afique sahélienne, afrique guinéenne/centrale et autres pays d'Afrique
 ```{r}
@@ -51,7 +53,8 @@ indiv_immig_pd <- svydesign(ids = indiv_immigre$ident, data = indiv_immigre, wei
 ```
 
 ```{r}
-cprop(svytable(~ agenq_cat + d_lieudisagr_d_rec, indiv_immig_pd))
+tb <- cprop(svytable(~ agenq_cat + d_lieudisagr_d_rec, indiv_immig_pd))
+xtable(tb)
 cprop(svytable(~ duretotfrm_cat + d_lieudisagr_d_rec, indiv_immig_pd))
 
 ```
@@ -62,8 +65,8 @@ cprop(svytable(~ l_quart_secu_rec + d_lieudisagr_d_rec, indiv_immig_pd))
 
 ```
 ```{r}
-cprop(svytable(~ sexee_rec + d_lieudisagr_d_rec, indiv_immig_pd))
-
+tb <- cprop(svytable(~ sexee_rec + d_lieudisagr_d_rec, indiv_immig_pd))
+xtable(tb)
 ```
 
 ```{r}
@@ -71,7 +74,7 @@ indiv_immigre_brad <- indiv_immigre %>%
   filter(origine_tous_g2_rec %in% c("Immigres d'Algerie", "Immigres du Maroc/Tunisie", "Immigres d'Afrique sahelienne", "Immigres d'Afrique guineenne/centrale","Immigres d'autres pays d'Afrique")) %>% 
   filter(agenq_cat %in% c("1", "2")) %>%  # Avant 40 ans
   filter(sexee_rec=="Masculin") %>% 
-  filter(i_contri_rec == "Jamais") #1611 qui représentent en pondéré 1036069
+  filter(i_contri_rec == "Jamais") #610 qui représentent en pondéré 317398
 
 indiv_immigre_brad_pd <- svydesign(ids = indiv_immigre_brad$ident, data = indiv_immigre_brad, weights = indiv_immigre_brad$poidsi)
 
@@ -86,7 +89,7 @@ indiv_immigre_nonbrad <- indiv_immigre %>%
   filter(origine_tous_g2_rec %in% c("Immigres d'Algerie", "Immigres du Maroc/Tunisie", "Immigres d'Afrique sahelienne", "Immigres d'Afrique guineenne/centrale","Immigres d'autres pays d'Afrique")) %>% 
   filter(agenq_cat %in% c("1", "2")) %>%  # Avant 40 ans
   filter(sexee_rec=="Masculin") %>% 
-  filter(i_contri_rec != "Jamais") #406 qui représentent en pondéré 225366
+  filter(i_contri_rec != "Jamais") #313 qui représentent en pondéré 173519
 
 indiv_immigre_nonbrad_pd <- svydesign(ids = indiv_immigre_nonbrad$ident, data = indiv_immigre_nonbrad, weights = indiv_immigre_nonbrad$poidsi)
 ```
@@ -95,3 +98,6 @@ indiv_immigre_nonbrad_pd <- svydesign(ids = indiv_immigre_nonbrad$ident, data = 
 prop.table(svytable(~i_cnfpol_rec, indiv_immigre_nonbrad_pd))
 ```
 
+```{r}
+prop.table(svytable(~i_cnfpol_rec, indiv_immig_pd))
+```
