@@ -412,9 +412,8 @@ indiv$a_rquart_code <- fct_recode(indiv$a_rquart_code,
                                   "null" = "9")
 
 
-#Faisons de i_controla et i_controlb une seule est même variable :
 
-## A : Ils vous ont expliqué ce qu'ils faisaient et pourquoi
+
 
 indiv <- indiv %>% 
   mutate(d_lieudisagr_d_rec = case_when(d_lieudisagr_d == 1 ~ "Discrimination lors d'un contrôle de police",
@@ -425,13 +424,17 @@ indiv$d_lieudisagr_d_rec <- as.factor(indiv$d_lieudisagr_d_rec)
 
 
 
-indiv <- indiv %>% 
-  mutate(i_control_rec_a = case_when(i_controla_a == 1 | i_controlb_d==1 ~ "Ils vous ont expliqué ce qu'ils faisaient et pourquoi",
-                                     i_controla_flag == 0 ~ "Question non posée (filtre)",
-                                     i_controla_flag == -1 | i_controla_flag == -2 ~ "Refus ou ne sait pas",
-                                     TRUE ~ "Ils ne vous ont rien expliqué"))
-indiv$i_control_rec_a <- as.factor(indiv$i_control_rec_a)
+#indiv <- indiv %>% 
+#  mutate(i_control_rec_a = case_when(i_controla_a == 1 | i_controlb_d==1 ~ "Ils vous ont expliqué ce qu'ils faisaient et pourquoi",
+#                                     i_controla_flag == 0 ~ "Question non posée (filtre)",
+#                                     i_controla_flag == -1 | i_controla_flag == -2 ~ "Refus ou ne sait pas",
+#                                     TRUE ~ "Ils ne vous ont rien expliqué"))
+#indiv$i_control_rec_a <- as.factor(indiv$i_control_rec_a)
 
+
+#Faisons de i_controla et i_controlb une seule est même variable :
+
+## A : Ils vous ont expliqué ce qu'ils faisaient et pourquoi
 res = rep(0,dimension[1])
 res[which(indiv$i_controla_a == 1 | indiv$i_controlb_d == 1)] = 1
 indiv["i_control_rec_a"] = res
@@ -486,6 +489,8 @@ indiv <- indiv %>%
                                    i_cnfpol > 4 ~ "Refus ou ne sait pas"))
 
 indiv["taux_confiance"] = (indiv$i_cnfpol < 3)*1
+
+indiv["uc_reve_isna"] = is.na(indiv$uc_reve)
 
 
 
