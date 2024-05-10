@@ -44,11 +44,6 @@ source("Base.R")
 indiv["i_cnfpol_1"] = (indiv$i_cnfpol < 3)*1
 
 
-#write_parquet(indiv,'C:/Users/3e3gr/OneDrive/Bureau/indiv.parquet')
-
-```
-
-```{r setup, include = FALSE}
 #Filtrage des "Refus" et autres "Ne sait pas"
 indiv <- indiv %>% filter(i_cnfpol < 8 & i_contri < 8 & l_quart_secu < 8 & l_immi < 8 & a_rquart < 8)
 
@@ -72,6 +67,9 @@ indiv["durar2"] = durar
 
 
 ```{r setup, include = FALSE}
+
+#Selection des varaibles à utiliser pour le modèle
+
 indiv_doi = indiv %>% select(c("ident","origine_tous_g2_class","i_cnfpol_1","sexee","group1_code","agenq","durar2","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart","poidsi","discri","d_lieudisagr_d_rec","compor_discri"))
 
 indiv_doi <- dummy_cols(indiv_doi, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
@@ -81,6 +79,7 @@ indiv_doi <- dummy_cols(indiv_doi, select_columns = c("origine_tous_g2_class","g
 
 ```{r setup, include=FALSE}
 
+#Entrainement de la Random Forest
 
 dataX = indiv_doi %>% select(-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1"))
 target = indiv_doi$i_cnfpol_1
@@ -111,6 +110,36 @@ Prediction totale = 0.8145
 Prediction sur les "1" = 0.8213
 Prediction sur les "0" = 0.7915
 
+```{r stupe, include=FALSE}
+pr = predict(rF,dataX)
+
+X = 0:100
+Y = c()
+Y1 = c()
+Y0 = c()
+
+for (i in X){
+  
+  prediction = (pr>(i/100))*1
+  pred1 = prediction[which(target==1)]
+  pred0 = prediction[which(target==0)]
+  
+  Y = c(Y,sum(prediction == target)/length(target))
+  Y1 = c(Y1,sum(pred1 == 1)/sum(target==1))
+  Y0 = c(Y0,sum(pred0 == 0)/sum(target==0))
+  
+}
+
+littleforest = data.frame(X = X, Y = Y, Y1 = Y1, Y0 = Y0)
+
+ggplot(littleforest,aes(x =X))+
+  geom_smooth(aes(y = Y),color="black")+
+  geom_smooth(aes(y = Y1),color="blue")+
+  geom_smooth(aes(y=Y0),color="red")+
+  ggtitle("Treshold")
+
+```
+
 
 ```{r setup, include=FALSE}
 #Rappel : 
@@ -128,7 +157,7 @@ listvar = rownames(dfp)[dfp["X.IncMSE"]>20 | dfp["IncNodePurity"]>50]
 ```
 
 ```{r setup, include=FALSE}
-fitree <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.002))
+fitree <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.0019))
 rpart.plot(fit, extra = 106)
 
 
@@ -151,3 +180,35 @@ print(sum(pred_tree1 == 1)/sum(target==1))
 print(sum(pred_tree0 == 0)/sum(target==0))
 
 ```
+
+```{r stupe, include=FALSE}
+pr_tree = predict(fitree,dataX)
+dpr_tree = data.frame(pr_tree)
+
+X = 0:100
+Y = c()
+Y1 = c()
+Y0 = c()
+
+for (i in X){
+  
+  prediction_tree = (dpr_tree$X1>(i/100))*1
+  pred_tree1 = prediction_tree[which(target==1)]
+  pred_tree0 = prediction_tree[which(target==0)]
+  
+  Y = c(Y,sum(prediction_tree == target)/length(target))
+  Y1 = c(Y1,sum(pred_tree1 == 1)/sum(target==1))
+  Y0 = c(Y0,sum(pred_tree0 == 0)/sum(target==0))
+  
+}
+
+littletree = data.frame(X = X, Y = Y, Y1 = Y1, Y0 = Y0)
+
+ggplot(littletree,aes(x =X))+
+  geom_smooth(aes(y = Y),color="black")+
+  geom_smooth(aes(y = Y1),color="blue")+
+  geom_smooth(aes(y=Y0),color="red")+
+  ggtitle("Treshold")
+
+```
+
