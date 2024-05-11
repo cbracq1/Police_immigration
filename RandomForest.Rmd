@@ -9,11 +9,11 @@ editor_options:
 ---
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+#knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r libraries, include = FALSE}
+```{r}
 library(haven)
 library(tidyr)
 library(tidyverse)
@@ -33,13 +33,13 @@ library(sparkline)
 
 ```
 
-```{r base, include = FALSE}
+```{r}
 source("Base.R")
 ```
 
 
 
-```{r base, include = FALSE}
+```{r}
 #Définition de la variable-cible : avoir au moins plutot confiance en la police
 indiv["i_cnfpol_1"] = (indiv$i_cnfpol < 3)*1
 
@@ -49,9 +49,7 @@ indiv <- indiv %>% filter(i_cnfpol < 8 & i_contri < 8 & l_quart_secu < 8 & l_imm
 
 indiv <- indiv %>% drop_na(d_lieudisagr_d_rec)
 
-```
 
-```{r setup, include = FALSE}
 #On s'occupe des durar
 
 durar = indiv$durar2
@@ -63,54 +61,61 @@ durar[index_na] = age[index_na]
 
 indiv["durar2"] = durar
 
-```
 
-
-```{r setup, include = FALSE}
 
 #Selection des varaibles à utiliser pour le modèle
 
 indiv_doi = indiv %>% select(c("ident","origine_tous_g2_class","i_cnfpol_1","sexee","group1_code","agenq","durar2","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart","poidsi","discri","d_lieudisagr_d_rec","compor_discri"))
 
 indiv_doi <- dummy_cols(indiv_doi, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
+
+indiv_doi = indiv_doi %>% select(-c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
+
 ```
 
 
+```{r}
+index_metro = which(indiv_doi$group1_code_Autre == 1)
+  
+index_immig = which(indiv_doi$group1_code_G1_I == 1)
 
-```{r setup, include=FALSE}
+```
 
-#Entrainement de la Random Forest
 
-dataX = indiv_doi %>% select(-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1"))
+```{r}
+
+#Entrainement de la Random Forest (pop = Ensemble)
+
+dataX = dplyr::select(indiv_doi,-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1"))
 target = indiv_doi$i_cnfpol_1
 
 
 rF=randomForest(x=dataX,y=target,ntree=1000,weights=indiv_doi$poidsi,importance=TRUE)
 
 
+
+#Entrainement de la Random Forest (pop = metropolitain)
+dataX_metro = dataX[index_metro,]
+target_metro = target[index_metro]
+
+rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=1000,weights=indiv_doi$poidsi[index_metro],importance=TRUE)
+
+
+
+#Entrainement de la Random Forest (pop = immigrée)
+dataX_immig = dataX[index_immig,]
+target_immig = target[index_immig]
+
+rF_immig=randomForest(x=dataX_immig,y=target_immig,ntree=1000,weights=indiv_doi$poidsi[index_immig],importance=TRUE)
+
+
 ```
 
-```{r setup, include=FALSE}
-pr = predict(rF,dataX)
+### a) Ensemble
 
 
-prediction = (pr>0.74)*1
 
-pred1 = prediction[which(target==1)]
-pred0 = prediction[which(target==0)]
-
-print(sum(prediction == target)/length(target))
-print(sum(pred1 == 1)/sum(target==1))
-print(sum(pred0 == 0)/sum(target==0))
-
-```
-
-Prediction totale = 0.8145
-
-Prediction sur les "1" = 0.8213
-Prediction sur les "0" = 0.7915
-
-```{r stupe, include=FALSE}
+```{r}
 pr = predict(rF,dataX)
 
 X = 0:100
@@ -130,33 +135,180 @@ for (i in X){
   
 }
 
-littleforest = data.frame(X = X, Y = Y, Y1 = Y1, Y0 = Y0)
+Threshold = X
+Accuracy = Y
 
-ggplot(littleforest,aes(x =X))+
-  geom_smooth(aes(y = Y),color="black")+
+littleforest = data.frame(X = Threshold, Y = Accuracy, Y1 = Y1, Y0 = Y0)
+
+ggplot(littleforest,aes(x =Threshold))+
+  geom_smooth(aes(y = Accuracy),color="black")+
   geom_smooth(aes(y = Y1),color="blue")+
   geom_smooth(aes(y=Y0),color="red")+
-  ggtitle("Treshold")
+  ggtitle("Performance du modèle selon la threshold (pop = Ensemble)")
 
 ```
 
+```{r}
+#Choix de la threshold et évaluation du modèle
 
-```{r setup, include=FALSE}
-#Rappel : 
-# type=1 -> increasing mean of accuracy
-# type=2 -> increasing mean of node purity
+s = 75
+
+print(Y[s+1])
+print(Y1[s+1])
+print(Y0[s+1])
+
+```
+
+Threshold = 0.7
+
+Prediction totale = 0.8096
+
+Prediction sur les "1" = 0.8096
+Prediction sur les "0" = 0.8097
+
+```{r}
+# Les variables les plus importantes
+
 
 pertinence1 = importance(rF,type=1)
-pertinence2 = importance(rF,type=2)
 
+dfp = data.frame(pertinence1)
 
-dfp = data.frame(pertinence1,pertinence2)
-
-listvar = rownames(dfp)[dfp["X.IncMSE"]>20 | dfp["IncNodePurity"]>50]
+listvar = rownames(dfp)[dfp["X.IncMSE"]>30]
 
 ```
 
-```{r setup, include=FALSE}
+### b) Metropolitains
+
+```{r}
+pr = predict(rF_metro,dataX)
+
+X = 0:100
+Y = c()
+Y1 = c()
+Y0 = c()
+
+for (i in X){
+  
+  prediction = (pr>(i/100))*1
+  pred1 = prediction[which(target==1)]
+  pred0 = prediction[which(target==0)]
+  
+  Y = c(Y,sum(prediction == target)/length(target))
+  Y1 = c(Y1,sum(pred1 == 1)/sum(target==1))
+  Y0 = c(Y0,sum(pred0 == 0)/sum(target==0))
+  
+}
+
+Threshold = X
+Accuracy = Y
+
+littleforest = data.frame(X = Threshold, Y = Accuracy, Y1 = Y1, Y0 = Y0)
+
+ggplot(littleforest,aes(x =Threshold))+
+  geom_smooth(aes(y = Accuracy),color="black")+
+  geom_smooth(aes(y = Y1),color="blue")+
+  geom_smooth(aes(y=Y0),color="red")+
+  ggtitle("Performance du modèle selon la threshold (pop = metropolitaine)")
+
+```
+
+```{r}
+#Choix de la threshold et évaluation du modèle
+
+threshold = 75
+
+print(Y[s+1])
+print(Y1[s+1])
+print(Y0[s+1])
+
+```
+Y = 0.6605
+Y1 = 0.6745
+Y0 = 0.6130
+
+```{r}
+# Les variables les plus importantes
+
+pertinence1 = importance(rF_metro,type=1)
+
+dfp = data.frame(pertinence1)
+
+listvar = rownames(dfp)[dfp["X.IncMSE"]>20]
+
+```
+
+### c) Immigrés
+
+```{r}
+pr = predict(rF_immig,dataX)
+
+X = 0:100
+Y = c()
+Y1 = c()
+Y0 = c()
+
+for (i in X){
+  
+  prediction = (pr>(i/100))*1
+  pred1 = prediction[which(target==1)]
+  pred0 = prediction[which(target==0)]
+  
+  Y = c(Y,sum(prediction == target)/length(target))
+  Y1 = c(Y1,sum(pred1 == 1)/sum(target==1))
+  Y0 = c(Y0,sum(pred0 == 0)/sum(target==0))
+  
+}
+
+Threshold = X
+Accuracy = Y
+
+littleforest = data.frame(X = Threshold, Y = Accuracy, Y1 = Y1, Y0 = Y0)
+
+ggplot(littleforest,aes(x =Threshold))+
+  geom_smooth(aes(y = Accuracy),color="black")+
+  geom_smooth(aes(y = Y1),color="blue")+
+  geom_smooth(aes(y=Y0),color="red")+
+  ggtitle("Performance du modèle selon la threshold (pop = immigrée)")
+
+```
+
+```{r}
+#Choix de la threshold et évaluation du modèle
+
+s= 78
+
+print(Y[s+1])
+print(Y1[s+1])
+print(Y0[s+1])
+
+```
+Threshold = 0.78
+
+Y = 0.7003461
+Y1 = 0.7032808
+Y0 = 0.6903793
+
+```{r}
+
+# Les variables les plus importantes
+
+pertinence1 = importance(rF_immig,type=1)
+
+dfp = data.frame(pertinence1)
+
+listvar = rownames(dfp)[dfp["X.IncMSE"]>20]
+
+```
+
+
+
+
+
+
+## Arbre de décision visuel
+
+```{r}
 fitree <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.0019))
 rpart.plot(fit, extra = 106)
 
@@ -164,7 +316,10 @@ rpart.plot(fit, extra = 106)
 visTree(fitree)
 ```
 
-```{r stupe, include=FALSE}
+
+
+
+```{r}
 pr_tree = predict(fitree,dataX)
 
 dpr_tree = data.frame(pr_tree)
@@ -181,7 +336,7 @@ print(sum(pred_tree0 == 0)/sum(target==0))
 
 ```
 
-```{r stupe, include=FALSE}
+```{r}
 pr_tree = predict(fitree,dataX)
 dpr_tree = data.frame(pr_tree)
 
