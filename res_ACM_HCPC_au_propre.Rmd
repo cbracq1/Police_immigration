@@ -60,13 +60,14 @@ res.HCPC<-HCPC(res,nb.clust=6,consol=FALSE,graph=FALSE)
 ```
 
 ```{r, echo = FALSE}
-barplot(res1.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
+barplot(res.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
         col="lightblue",border = "grey", axes = TRUE)
 ```
 
 ```{r, echo = FALSE}
 plot.HCPC(res.HCPC,choice='tree',title='Arbre hiérarchique')
 plot.HCPC(res.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
+plot.HCPC(res.HCPC, choice = 'map', draw.tree = FALSE, title = 'Plan factoriel', label = 'none')
 plot.HCPC(res.HCPC,choice='3D.map',ind.names=FALSE,centers.plot=FALSE,angle=60,title='Arbre hiérarchique sur le plan factoriel')
 ```
 Description des classes :
@@ -97,7 +98,7 @@ acm2_classe <- cbind(indiv_acm2_poids, clust)
 ```
 
 ```{r}
-table(acm2_classe$clust)
+xtable(table(acm2_classe$clust))
 ```
 
 
@@ -106,7 +107,7 @@ library(GGally)
 ggtable(
   acm2_classe, 
   columnsX = "clust", 
-  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","origine_tous_g2_rec", "qpv_i_rec", "sexee_rec", "durtotfrm", "agenq"),
+  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","origine_tous_g2_rec", "qpv_i_rec", "l_quart_secu_rec", "csnq_ego_rec", "l_immi_rec", "sexee_rec", "durar2", "agenq"),
   mapping = aes(weight = poidsi),
   cells = "col.prop",
   fill = "std.resid",
