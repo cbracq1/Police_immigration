@@ -65,11 +65,16 @@ indiv["durar2"] = durar
 
 #Selection des varaibles à utiliser pour le modèle
 
-indiv_doi = indiv %>% select(c("ident","origine_tous_g2_class","i_cnfpol_1","sexee","group1_code","agenq","durar2","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart","poidsi","discri","d_lieudisagr_d_rec","compor_discri"))
+#indiv_doi = indiv %>% select(c("ident","origine_tous_g2_class","i_cnfpol_1","sexee","group1_code","agenq","durar2","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart","poidsi","discri","d_lieudisagr_d_rec","compor_discri"))
 
-indiv_doi <- dummy_cols(indiv_doi, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
 
-indiv_doi = indiv_doi %>% select(-c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
+indiv_doi <- dummy_cols(indiv, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
+
+indiv_doi = indiv_doi %>% select(-c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec","taux_confiance","a_confiance","i_cnfpol_rec","i_cnfpol"))
+```
+
+```{r}
+indiv_doi = indiv_doi[ , colSums(is.na(indiv_doi))==0]
 
 ```
 
@@ -86,11 +91,11 @@ index_immig = which(indiv_doi$group1_code_G1_I == 1)
 
 #Entrainement de la Random Forest (pop = Ensemble)
 
-dataX = dplyr::select(indiv_doi,-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1"))
+dataX = select(indiv_doi,-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1"))
 target = indiv_doi$i_cnfpol_1
 
 
-rF=randomForest(x=dataX,y=target,ntree=1000,weights=indiv_doi$poidsi,importance=TRUE)
+rF=randomForest(x=dataX,y=target,ntree=100,weights=indiv_doi$poidsi,importance=TRUE)
 
 
 
@@ -98,7 +103,7 @@ rF=randomForest(x=dataX,y=target,ntree=1000,weights=indiv_doi$poidsi,importance=
 dataX_metro = dataX[index_metro,]
 target_metro = target[index_metro]
 
-rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=1000,weights=indiv_doi$poidsi[index_metro],importance=TRUE)
+#rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=100,weights=indiv_doi$poidsi[index_metro],importance=TRUE)
 
 
 
@@ -106,7 +111,8 @@ rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=1000,weights=indiv_doi$
 dataX_immig = dataX[index_immig,]
 target_immig = target[index_immig]
 
-rF_immig=randomForest(x=dataX_immig,y=target_immig,ntree=1000,weights=indiv_doi$poidsi[index_immig],importance=TRUE)
+#rF_immig=randomForest(x=dataX_immig,y=target_immig,ntree=100,weights=indiv_doi$poidsi[index_immig],importance=TRUE)
+
 
 
 ```
@@ -157,6 +163,13 @@ print(Y[s+1])
 print(Y1[s+1])
 print(Y0[s+1])
 
+prediction = (pr>(s/100))*1
+pred_metro = prediction[index_metro]
+acc_metro =sum(pred_metro==target_metro)/length(index_metro)
+
+pred_immig = prediction[index_immig]
+acc_immig =sum(pred_immig==target_immig)/length(index_immig)
+
 ```
 
 Threshold = 0.7
@@ -165,6 +178,10 @@ Prediction totale = 0.8096
 
 Prediction sur les "1" = 0.8096
 Prediction sur les "0" = 0.8097
+
+Prediction sur les métropolitains = 0.8449275
+Prediction sur les immigrés = 0.8794882
+
 
 ```{r}
 # Les variables les plus importantes
@@ -216,16 +233,16 @@ ggplot(littleforest,aes(x =Threshold))+
 ```{r}
 #Choix de la threshold et évaluation du modèle
 
-threshold = 75
+s = 77
 
 print(Y[s+1])
 print(Y1[s+1])
 print(Y0[s+1])
 
 ```
-Y = 0.6605
-Y1 = 0.6745
-Y0 = 0.6130
+Y = 0.6382
+Y1 = 0.6348
+Y0 = 0.6498
 
 ```{r}
 # Les variables les plus importantes
@@ -302,7 +319,7 @@ listvar = rownames(dfp)[dfp["X.IncMSE"]>20]
 ```
 
 
-
+Nous constatons étonnament que les Random Forest sur les métropolitains et les immigrés sont en tout point moins performant que la Random Forest sur l'Ensemble : nous travaillerons donc à cette échelle.
 
 
 
