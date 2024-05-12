@@ -71,20 +71,21 @@ indiv["durar2"] = durar
 #indiv_doi <- dummy_cols(indiv, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
 
 #On retire les redondances
+indiv_doi = indiv %>% dplyr::select(-c("origine_tous_g2_rec","origine_tous_g2_cont","origine_tous_g2_code","group1","group1_rec","taux_confiance","a_confiance","i_cnfpol_rec","i_cnfpol","uc_reve_isna","l_immi_code","a_rquart_code","i_cnfjus","i_ecole","i_contri","l_immi","a_rquart","qpv_i","l_quart_secu","sexee","f_dip","csnq_premp","csnq_ego"))
 
-indiv_doi = indiv_doi %>% dplyr::select(-c("origine_tous_g2_rec","origine_tous_g2_cont","origine_tous_g2_code","group1" "group1_rec","taux_confiance","a_confiance","i_cnfpol_rec","i_cnfpol","uc_reve_isna","l_immi_code","a_rquart_code","i_cnfjus","i_ecole","i_contri","l_immi","a_rquart","qpv_i","l_quart_secu","sexee","f_dip","csnq_premp","csnq_ego",))
-```
 
-```{r}
+#On retire les colonnes à NA
 indiv_doi = indiv_doi[ , colSums(is.na(indiv_doi))==0]
 
 ```
 
 
 ```{r}
-index_metro = which(indiv_doi$group1_code_Autre == 1)
+index_metro = which(indiv_doi$group1_code == "Autre")
   
-index_immig = which(indiv_doi$group1_code_G1_I == 1)
+index_immig = which(indiv_doi$group1_code == "G1_I")
+
+indiv_doi = indiv_doi[c(index_metro,index_immig),]
 
 ```
 
@@ -93,7 +94,7 @@ index_immig = which(indiv_doi$group1_code_G1_I == 1)
 
 #Entrainement de la Random Forest (pop = Ensemble)
 
-dataX = select(indiv_doi,-one_of("ident","origine_tous_g2_class","group1_code","poidsi","i_cnfpol_1"))
+dataX = select(indiv_doi,-one_of("ident","poidsi","i_cnfpol_1"))
 target = indiv_doi$i_cnfpol_1
 
 
@@ -159,7 +160,7 @@ ggplot(littleforest,aes(x =Threshold))+
 ```{r}
 #Choix de la threshold et évaluation du modèle
 
-s = 71
+s = 70
 
 print(Y[s+1])
 print(Y1[s+1])
@@ -187,13 +188,13 @@ Prediction sur les métropolitains = 0.8449275
 Prediction sur les immigrés = 0.8794882
 
 s=71
-1] 0.9065165
-[1] 0.9075079
-[1] 0.9031498
+1] 0.9032997
+[1] 0.9049211
+[1] 0.897793
 acc_immig
-[1] 0.9289725
-acc_metro
-[1] 0.9547101
+[1] 0.9215302
+> acc_metro
+[1] 0.9271739
 
 
 ```{r}
