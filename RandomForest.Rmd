@@ -71,7 +71,7 @@ indiv["durar2"] = durar
 #indiv_doi <- dummy_cols(indiv, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
 
 #On retire les redondances
-indiv_doi = indiv %>% dplyr::select(-c("origine_tous_g2_rec","origine_tous_g2_code","group1","group1_rec","taux_confiance","a_confiance","i_cnfpol_rec","i_cnfpol","uc_reve_isna","l_immi_code","a_rquart_code","i_cnfjus","i_ecole","i_contri","l_immi","a_rquart","qpv_i","l_quart_secu","sexee","f_dip","csnq_premp","csnq_ego"))
+indiv_doi = indiv %>% dplyr::select(-c("origine_tous_g2_rec","origine_tous_g2_code","group1","group1_rec","taux_confiance","a_confiance","i_cnfpol_rec","i_cnfpol","uc_reve_isna","l_immi_code","a_rquart_code","i_cnfjus","i_ecole","i_contri","l_immi","a_rquart","qpv_i","l_quart_secu","sexee","f_dip","csnq_premp","csnq_ego","i_cnfjus_rec","i_ecole_rec"))
 
 #"i_cnfjus_rec","i_ecole_rec"
 
@@ -107,7 +107,7 @@ rF=randomForest(x=dataX,y=target,ntree=100,weights=indiv_doi$poidsi,importance=T
 dataX_metro = dataX[index_metro,]
 target_metro = target[index_metro]
 
-#rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=100,weights=indiv_doi$poidsi[index_metro],importance=TRUE)
+rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=100,weights=indiv_doi$poidsi[index_metro],importance=TRUE)
 
 
 
@@ -115,7 +115,7 @@ target_metro = target[index_metro]
 dataX_immig = dataX[index_immig,]
 target_immig = target[index_immig]
 
-#rF_immig=randomForest(x=dataX_immig,y=target_immig,ntree=100,weights=indiv_doi$poidsi[index_immig],importance=TRUE)
+rF_immig=randomForest(x=dataX_immig,y=target_immig,ntree=100,weights=indiv_doi$poidsi[index_immig],importance=TRUE)
 
 
 
@@ -161,7 +161,7 @@ ggplot(littleforest,aes(x =Threshold))+
 ```{r}
 #Choix de la threshold et évaluation du modèle
 
-s = 74
+s = 76
 
 print(Y[s+1])
 print(Y1[s+1])
@@ -188,14 +188,15 @@ Prediction sur les "0" = 0.8097
 Prediction sur les métropolitains = 0.8449275
 Prediction sur les immigrés = 0.8794882
 
-s=71
-1] 0.9032997
-[1] 0.9049211
-[1] 0.897793
+s=76
+0.8985507
+[1] 0.9008082
+[1] 0.8878219
 acc_immig
-[1] 0.9215302
-> acc_metro
-[1] 0.9271739
+acc_immig
+[1] 0.8955477
+acc_metro
+[1] 0.9027174
 
 
 ```{r}
@@ -339,6 +340,18 @@ Nous constatons étonnament que les Random Forest sur les métropolitains et les
 
 
 ## Arbre de décision visuel
+
+```{r}
+
+#Selection des varaibles à utiliser pour le modèle
+
+#indiv_doi = indiv %>% select(c("ident","origine_tous_g2_class","i_cnfpol_1","sexee","group1_code","agenq","durar2","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart","poidsi","discri","d_lieudisagr_d_rec","compor_discri"))
+
+
+#indiv_doi <- dummy_cols(indiv, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
+
+```
+
 
 ```{r}
 fitree <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.005))
