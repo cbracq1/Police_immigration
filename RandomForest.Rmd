@@ -88,6 +88,7 @@ index_immig = which(indiv_doi$group1_code == "G1_I")
 indiv_doi = indiv_doi[c(index_metro,index_immig),]
 
 indiv_metro = indiv_doi[c(index_metro),]
+
 indiv_immig = indiv_doi[c(index_immig),]
 
 ```
@@ -163,7 +164,7 @@ ggplot(littleforest,aes(x =Threshold))+
 ```{r}
 #Choix de la threshold et évaluation du modèle
 
-s = 76
+s = 75
 
 print(Y[s+1])
 print(Y1[s+1])
