@@ -71,8 +71,9 @@ indiv["durar2"] = durar
 #indiv_doi <- dummy_cols(indiv, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
 
 #On retire les redondances
-indiv_doi = indiv %>% dplyr::select(-c("origine_tous_g2_rec","origine_tous_g2_cont","origine_tous_g2_code","group1","group1_rec","taux_confiance","a_confiance","i_cnfpol_rec","i_cnfpol","uc_reve_isna","l_immi_code","a_rquart_code","i_cnfjus","i_ecole","i_contri","l_immi","a_rquart","qpv_i","l_quart_secu","sexee","f_dip","csnq_premp","csnq_ego"))
+indiv_doi = indiv %>% dplyr::select(-c("origine_tous_g2_rec","origine_tous_g2_code","group1","group1_rec","taux_confiance","a_confiance","i_cnfpol_rec","i_cnfpol","uc_reve_isna","l_immi_code","a_rquart_code","i_cnfjus","i_ecole","i_contri","l_immi","a_rquart","qpv_i","l_quart_secu","sexee","f_dip","csnq_premp","csnq_ego"))
 
+#"i_cnfjus_rec","i_ecole_rec"
 
 #On retire les colonnes à NA
 indiv_doi = indiv_doi[ , colSums(is.na(indiv_doi))==0]
@@ -160,7 +161,7 @@ ggplot(littleforest,aes(x =Threshold))+
 ```{r}
 #Choix de la threshold et évaluation du modèle
 
-s = 70
+s = 74
 
 print(Y[s+1])
 print(Y1[s+1])
