@@ -83,10 +83,12 @@ indiv_doi = indiv_doi[ , colSums(is.na(indiv_doi))==0]
 
 ```{r}
 index_metro = which(indiv_doi$group1_code == "Autre")
-  
 index_immig = which(indiv_doi$group1_code == "G1_I")
 
 indiv_doi = indiv_doi[c(index_metro,index_immig),]
+
+indiv_metro = indiv_doi[c(index_metro),]
+indiv_immig = indiv_doi[c(index_immig),]
 
 ```
 
@@ -104,16 +106,16 @@ rF=randomForest(x=dataX,y=target,ntree=100,weights=indiv_doi$poidsi,importance=T
 
 
 #Entrainement de la Random Forest (pop = metropolitain)
-dataX_metro = dataX[index_metro,]
-target_metro = target[index_metro]
+dataX_metro = select(indiv_metro,-one_of("ident","poidsi","i_cnfpol_1"))
+target_metro = indiv_metro$i_cnfpol_1
 
-rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=100,weights=indiv_doi$poidsi[index_metro],importance=TRUE)
+rF_metro=randomForest(x=dataX_metro,y=target_metro,ntree=100,weights=indiv_metro$poidsi,importance=TRUE)
 
 
 
 #Entrainement de la Random Forest (pop = immigrée)
-dataX_immig = dataX[index_immig,]
-target_immig = target[index_immig]
+dataX_immig = select(indiv_immig,-one_of("ident","poidsi","i_cnfpol_1"))
+target_immig = indiv_immig$i_cnfpol_1
 
 rF_immig=randomForest(x=dataX_immig,y=target_immig,ntree=100,weights=indiv_doi$poidsi[index_immig],importance=TRUE)
 
