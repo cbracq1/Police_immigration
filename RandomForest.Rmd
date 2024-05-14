@@ -87,6 +87,7 @@ index_immig = which(indiv_doi$group1_code == "G1_I")
 
 indiv_ensem = indiv_doi[c(index_metro,index_immig),]
 
+
 indiv_metro = indiv_doi[c(index_metro),]
 
 indiv_immig = indiv_doi[c(index_immig),]
@@ -353,9 +354,10 @@ indiv_tree <- indiv_tree %>%
                                    i_contri_rec == "Plus de 5 fois" ~ 4))
 
 indiv_tree <- indiv_tree %>% 
-  mutate(secu_quartier = case_when(l_quart_secu_rec == "Bonne" ~ 1,
+  mutate(secu_quartier = case_when(l_quart_secu_rec == "Bonne" ~ 3,
                                    l_quart_secu_rec == "Moyenne" ~ 2,
-                                   l_quart_secu_rec == "Mauvaise" ~ 3))
+                                   l_quart_secu_rec == "Mauvaise" ~ 1))
+
 
 indiv_tree <- indiv_tree %>% 
   mutate(comp_discr = case_when(compor_discri == "Discrimination dans le comportement de la police par le négatif" ~ "Négatif",
@@ -371,12 +373,18 @@ indiv_tree <- indiv_tree %>% select(-c("compor_discri","l_quart_secu_rec","i_con
 ```
 
 
+
+```{r}
+#indiv_tree=indiv_arbre
+
+```
+
+
 ```{r}
 data_tree = select(indiv_tree,-one_of("ident","poidsi","i_cnfpol_1"))
 target_tree = indiv_tree$i_cnfpol_1
 
 fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree$poidsi, control = rpart.control(cp = 0.005))
-#rpart.plot(fitree, extra = 106)
 
 
 visTree(fitree)
@@ -412,7 +420,6 @@ data_tree = select(indiv_tree_m,-one_of("ident","poidsi","i_cnfpol_1"))
 target_tree = indiv_tree_m$i_cnfpol_1
 
 fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree_m$poidsi, control = rpart.control(cp = 0.005))
-#rpart.plot(fitree, extra = 106)
 
 
 visTree(fitree)
@@ -447,7 +454,6 @@ data_tree = select(indiv_tree_i,-one_of("ident","poidsi","i_cnfpol_1"))
 target_tree = indiv_tree_i$i_cnfpol_1
 
 fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree_i$poidsi, control = rpart.control(cp = 0.005))
-#rpart.plot(fitree, extra = 106)
 
 
 visTree(fitree)
@@ -467,6 +473,36 @@ print(sum(pred_tree1 == 1)/sum(target_tree==1))
 print(sum(pred_tree0 == 0)/sum(target_tree==0))
 ```
 
+# Etude du cluster 1.3.1 (tout à droite)
+
+```{r}
+
+origine = indiv[c(index_immig),]["origine_tous_g2_rec"]
+
+indiv_tree_i_org = indiv_tree_i
+indiv_tree_i_org["origine"] = origine
+
+ba=indiv_tree_i_org[which(indiv_tree_i$i_control_rec_d < 0.5 & indiv_tree_i$d_lieudisagr_nbval < 1.5),]
+
+
+ba_pd = svydesign(ids = ba$ident, data = ba, weights = ba$poidsi)
+
+
+
+tb1 <- data.frame(cprop(svytable(~i_cnfpol_1+origine, ba_pd[which(ba_pd$variables$i_cnfpol_1 != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,i_cnfpol_1 != "Total")
+
+ggplot(tb2, aes(x = origine, y= Freq, fill = i_cnfpol_1)) +
+  geom_bar(stat="identity")
+
+
+tb1 <- data.frame(cprop(svytable(~origine+i_cnfpol_1, ba_pd[which(ba_pd$variables$origine != "Refus ou ne sait pas")])))
+tb2 <- filter(tb1,origine != "Total")
+
+ggplot(tb2, aes(x = i_cnfpol_1, y= Freq, fill = origine)) +
+  geom_bar(stat="identity")
+
+```
 
 
 
