@@ -85,11 +85,14 @@ indiv_doi = indiv_doi[ , colSums(is.na(indiv_doi))==0]
 index_metro = which(indiv_doi$group1_code == "Autre")
 index_immig = which(indiv_doi$group1_code == "G1_I")
 
-indiv_doi = indiv_doi[c(index_metro,index_immig),]
+indiv_ensem = indiv_doi[c(index_metro,index_immig),]
 
 indiv_metro = indiv_doi[c(index_metro),]
 
 indiv_immig = indiv_doi[c(index_immig),]
+
+i_metro = which(indiv_ensem$group1_code == "Autre")
+i_immig = which(indiv_ensem$group1_code == "G1_I")
 
 ```
 
@@ -98,11 +101,10 @@ indiv_immig = indiv_doi[c(index_immig),]
 
 #Entrainement de la Random Forest (pop = Ensemble)
 
-dataX = select(indiv_doi,-one_of("ident","poidsi","i_cnfpol_1"))
-target = indiv_doi$i_cnfpol_1
+dataX = select(indiv_ensem,-one_of("ident","poidsi","i_cnfpol_1"))
+target = indiv_ensem$i_cnfpol_1
 
-
-rF=randomForest(x=dataX,y=target,ntree=100,weights=indiv_doi$poidsi,importance=TRUE)
+rF=randomForest(x=dataX,y=target,ntree=100,weights=indiv_ensem$poidsi,importance=TRUE)
 
 
 
@@ -170,36 +172,44 @@ print(Y[s+1])
 print(Y1[s+1])
 print(Y0[s+1])
 
-prediction = (pr>(s/100))*1
-pred_metro = prediction[index_metro]
-acc_metro =sum(pred_metro==target_metro)/length(index_metro)
+prediction = as.vector((pr>(s/100))*1)
 
-pred_immig = prediction[index_immig]
-acc_immig =sum(pred_immig==target_immig)/length(index_immig)
+n_true_metro = 0
+n_true_immig = 0
+for (i in 1:length(prediction)){
+  if (is.element(i,i_metro)){
+    n_true_metro = n_true_metro + (prediction[i]==target[i])*1
+  }
+  else{ 
+    if (is.element(i,i_immig)){
+    n_true_immig = n_true_immig + (prediction[i]==target[i])*1
+  }
+  }
+}
+
+acc_metro = n_true_metro/length(i_metro)
+
+acc_immig = n_true_immig/length(i_immig)
+
+print(acc_metro)
+print(acc_immig)
 
 ```
 
+
+
 Threshold = 0.74
 
-Prediction totale = 0.8096
+Prediction totale = 0.8806434
 
-Prediction sur les "1" = 0.8096
-Prediction sur les "0" = 0.8097
+Prediction sur les "1" = 0.8796841
+Prediction sur les "0" = 0.885203
 
 
 
-Prediction sur les métropolitains = 0.8449275
-Prediction sur les immigrés = 0.8794882
+Prediction sur les métropolitains = 0.9175725
+Prediction sur les immigrés = 0.8540279
 
-s=76
-0.8985507
-[1] 0.9008082
-[1] 0.8878219
-acc_immig
-acc_immig
-[1] 0.8955477
-acc_metro
-[1] 0.9027174
 
 
 ```{r}
@@ -210,7 +220,7 @@ pertinence1 = importance(rF,type=1)
 
 dfp = data.frame(pertinence1)
 
-listvar = rownames(dfp)[dfp["X.IncMSE"]>5]
+listvar = rownames(dfp)[dfp["X.IncMSE"]>5.1]
 
 ```
 
@@ -252,25 +262,11 @@ ggplot(littleforest,aes(x =Threshold))+
 ```{r}
 #Choix de la threshold et évaluation du modèle
 
-s = 77
+s = 58
 
 print(Y[s+1])
 print(Y1[s+1])
 print(Y0[s+1])
-
-```
-Y = 0.6382
-Y1 = 0.6348
-Y0 = 0.6498
-
-```{r}
-# Les variables les plus importantes
-
-pertinence1 = importance(rF_metro,type=1)
-
-dfp = data.frame(pertinence1)
-
-listvar = rownames(dfp)[dfp["X.IncMSE"]>20]
 
 ```
 
@@ -312,28 +308,11 @@ ggplot(littleforest,aes(x =Threshold))+
 ```{r}
 #Choix de la threshold et évaluation du modèle
 
-s= 78
+s= 74
 
 print(Y[s+1])
 print(Y1[s+1])
 print(Y0[s+1])
-
-```
-Threshold = 0.78
-
-Y = 0.7003461
-Y1 = 0.7032808
-Y0 = 0.6903793
-
-```{r}
-
-# Les variables les plus importantes
-
-pertinence1 = importance(rF_immig,type=1)
-
-dfp = data.frame(pertinence1)
-
-listvar = rownames(dfp)[dfp["X.IncMSE"]>6]
 
 ```
 
@@ -345,20 +324,59 @@ Nous constatons étonnament que les Random Forest sur les métropolitains et les
 ## Arbre de décision visuel
 
 ```{r}
+#Traitement
 
-#Selection des varaibles à utiliser pour le modèle
-
-#indiv_doi = indiv %>% select(c("ident","origine_tous_g2_class","i_cnfpol_1","sexee","group1_code","agenq","durar2","i_contri","l_quart_secu","l_immi","qpv_i","a_rquart","poidsi","discri","d_lieudisagr_d_rec","compor_discri"))
+#traitement = which(base$x_moifr < 8 & f_dis_flag > -1 & base$pcs_menage != "NSP/Refus/Incodable" & base$x_moifr < 8 & base$x_apparf < 8 & base$p_statsoc < 98 & base$a_avis < 8 & base$dipdet < 99 & base$compor_discri != "Refus ou ne sait pas")
 
 
-#indiv_doi <- dummy_cols(indiv, select_columns = c("origine_tous_g2_class","group1_code","compor_discri","d_lieudisagr_d_rec"))
+
+```
+
+```{r}
+
+listvar =  c("anaise","agenq","arrivan","a_avis","x_moifr","x_apparf","coddipint","f_dis_flag","p_statsoc","s_alcfreq","pcs_ant","pcs_pere","dipdet","pcs_menage","d_lieudisagr_nbval","durar2","csnq_ego_rec","i_contri_rec","l_quart_secu_rec","origine_tous_g2_class","i_control_rec_d","i_control_rec_e","compor_discri")  
+
+```
+
+```{r}
+
+#Selection des varaibles à utiliser pour l'arbre (nous modifions listvar pour eviter les redondances). On en profite aussi pour retirer la frequence de consommation d'alcool.
+
+listvar_mieux = c(listvar[listvar != "s_alcfreq" & listvar != "coddipint" & listvar != "anaise" & listvar != "arrivan" & listvar != "pcs_pere"],c("ident","poidsi","i_cnfpol_1"))
+
+indiv_tree = indiv_ensem %>% select(listvar_mieux)
+
+indiv_tree <- indiv_tree %>% 
+  mutate(controle_freq = case_when(i_contri_rec == "Jamais" ~ 1,
+                                   i_contri_rec == "Une seule fois" ~ 2,
+                                   i_contri_rec == "De 2 à 5 fois" ~ 3,
+                                   i_contri_rec == "Plus de 5 fois" ~ 4))
+
+indiv_tree <- indiv_tree %>% 
+  mutate(secu_quartier = case_when(l_quart_secu_rec == "Bonne" ~ 1,
+                                   l_quart_secu_rec == "Moyenne" ~ 2,
+                                   l_quart_secu_rec == "Mauvaise" ~ 3))
+
+indiv_tree <- indiv_tree %>% 
+  mutate(comp_discr = case_when(compor_discri == "Discrimination dans le comportement de la police par le négatif" ~ "Négatif",
+                                compor_discri == "Discrimination dans le comportement de la police par le positif" ~ "Positif",
+                                compor_discri == "Pas de comportement discriminatoire lors du dernier contrôle" ~ "Absence"))
+
+#Dummysons les variables catégorielles
+
+indiv_tree <- dummy_cols(indiv_tree, select_columns = c("pcs_menage","pcs_ant","origine_tous_g2_class","csnq_ego_rec","comp_discr"))
+
+indiv_tree <- indiv_tree %>% select(-c("compor_discri","l_quart_secu_rec","i_contri_rec","pcs_menage","pcs_ant","origine_tous_g2_class","csnq_ego_rec","compor_discri"))
 
 ```
 
 
 ```{r}
-fitree <- rpart(target~., data = dataX, method = 'class',control = rpart.control(cp = 0.005))
-rpart.plot(fitree, extra = 106)
+data_tree = select(indiv_tree,-one_of("ident","poidsi","i_cnfpol_1"))
+target_tree = indiv_tree$i_cnfpol_1
+
+fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree$poidsi, control = rpart.control(cp = 0.005))
+#rpart.plot(fitree, extra = 106)
 
 
 visTree(fitree)
@@ -368,50 +386,88 @@ visTree(fitree)
 
 
 ```{r}
-pr_tree = predict(fitree,dataX)
 
-dpr_tree = data.frame(pr_tree)
+dpr_tree = data.frame(predict(fitree,data_tree))
 
+s = 50
 
-prediction_tree = (dpr_tree$X1>0.79)*1
+prediction_tree = (dpr_tree$X1>s/100)*1
 
-pred_tree1 = prediction_tree[which(target==1)]
-pred_tree0 = prediction_tree[which(target==0)]
+pred_tree1 = prediction_tree[which(target_tree==1)]
+pred_tree0 = prediction_tree[which(target_tree==0)]
 
-print(sum(prediction_tree == target)/length(target))
-print(sum(pred_tree1 == 1)/sum(target==1))
-print(sum(pred_tree0 == 0)/sum(target==0))
+print(sum(prediction_tree == target_tree)/length(target_tree))
+print(sum(pred_tree1 == 1)/sum(target_tree==1))
+print(sum(pred_tree0 == 0)/sum(target_tree==0))
 
 ```
+# b) Métropolitain
 
 ```{r}
-pr_tree = predict(fitree,dataX)
-dpr_tree = data.frame(pr_tree)
+indiv_tree_m = indiv_tree[c(i_metro),]
+``` 
 
-X = 0:100
-Y = c()
-Y1 = c()
-Y0 = c()
+```{r}
+data_tree = select(indiv_tree_m,-one_of("ident","poidsi","i_cnfpol_1"))
+target_tree = indiv_tree_m$i_cnfpol_1
 
-for (i in X){
-  
-  prediction_tree = (dpr_tree$X1>(i/100))*1
-  pred_tree1 = prediction_tree[which(target==1)]
-  pred_tree0 = prediction_tree[which(target==0)]
-  
-  Y = c(Y,sum(prediction_tree == target)/length(target))
-  Y1 = c(Y1,sum(pred_tree1 == 1)/sum(target==1))
-  Y0 = c(Y0,sum(pred_tree0 == 0)/sum(target==0))
-  
-}
+fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree_m$poidsi, control = rpart.control(cp = 0.005))
+#rpart.plot(fitree, extra = 106)
 
-littletree = data.frame(X = X, Y = Y, Y1 = Y1, Y0 = Y0)
 
-ggplot(littletree,aes(x =X))+
-  geom_smooth(aes(y = Y),color="black")+
-  geom_smooth(aes(y = Y1),color="blue")+
-  geom_smooth(aes(y=Y0),color="red")+
-  ggtitle("Treshold")
-
+visTree(fitree)
 ```
+
+
+
+```{r}
+dpr_tree = data.frame(predict(fitree,data_tree))
+
+s = 50
+
+prediction_tree = (dpr_tree$X1>s/100)*1
+
+pred_tree1 = prediction_tree[which(target_tree==1)]
+pred_tree0 = prediction_tree[which(target_tree==0)]
+
+print(sum(prediction_tree == target_tree)/length(target_tree))
+print(sum(pred_tree1 == 1)/sum(target_tree==1))
+print(sum(pred_tree0 == 0)/sum(target_tree==0))
+```
+
+
+#c) Immigrés
+
+```{r}
+indiv_tree_i = indiv_tree[c(i_immig),]
+``` 
+
+```{r}
+data_tree = select(indiv_tree_i,-one_of("ident","poidsi","i_cnfpol_1"))
+target_tree = indiv_tree_i$i_cnfpol_1
+
+fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree_i$poidsi, control = rpart.control(cp = 0.005))
+#rpart.plot(fitree, extra = 106)
+
+
+visTree(fitree)
+```
+```{r}
+dpr_tree = data.frame(predict(fitree,data_tree))
+
+s = 50
+
+prediction_tree = (dpr_tree$X1>s/100)*1
+
+pred_tree1 = prediction_tree[which(target_tree==1)]
+pred_tree0 = prediction_tree[which(target_tree==0)]
+
+print(sum(prediction_tree == target_tree)/length(target_tree))
+print(sum(pred_tree1 == 1)/sum(target_tree==1))
+print(sum(pred_tree0 == 0)/sum(target_tree==0))
+```
+
+
+
+
 

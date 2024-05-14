@@ -341,7 +341,6 @@ indiv$a_rquart_code <- fct_recode(indiv$a_rquart_code,
 
 
 
-
 indiv <- indiv %>% 
   mutate(d_lieudisagr_d_rec = case_when(d_lieudisagr_d == 1 ~ "Discrimination lors d'un contrôle de police",
                                       d_lieudisagr_flag == 0 ~ "Pas d'expérience de discrimination",
