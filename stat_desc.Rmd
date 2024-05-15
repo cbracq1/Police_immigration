@@ -878,9 +878,8 @@ dmat["Fréquence des contrôles"] = dmat$Fréquence_des_Contrôles
 
 dmat <- dmat %>% select(c("Confiance en la police","Fréquence des contrôles","Sécurité dans le quartier","Présence d'immigrés"))
 
-install.packages("ggcorrplot")
-library(ggcorrplot)
-corrplot(cor(dmat),method="number")
+corrplot(cor(dmat), order = 'AOE', addCoef.col = 'black', tl.pos = 'd',
+         cl.pos = 'n', col = COL2('PiYG'))
 ```
 
 
