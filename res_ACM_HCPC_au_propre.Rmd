@@ -24,7 +24,7 @@ editor_options:
 indiv_acm2 <- indiv %>%
   filter(i_cnfpol_rec!="Refus ou ne sait pas", i_contri_rec!="Refus ou ne sait pas", d_lieudisagr_d_rec!="Refus ou ne sait pas") %>% 
     filter(group1_code == "G1_I") %>% 
-  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, sexee_rec, csnq_ego_rec, compor_discri, durtotfrm, durar2, agenq, ident, poidsi)  
+  select(i_cnfpol_rec, i_contri_rec, d_lieudisagr_d_rec, origine_tous_g2_rec, l_immi_rec, a_rquart_code, l_quart_secu_rec, qpv_i_rec, sexee_rec, csnq_ego_rec, f_dip, x_moifr, compor_discri, durtotfrm, durar2, agenq, ident, poidsi)  
 
 rownames(indiv_acm2) <- paste(indiv_acm2$ident)
 indiv_acm2_poids <- indiv_acm2 %>% select(-ident) 
@@ -34,7 +34,7 @@ indiv_acm2 <- indiv_acm2_poids %>% select(-poidsi)
 
 
 ```{r, include =FALSE}
-res <- MCA(indiv_acm2, quali.sup = 4:11, quanti.sup = 12:14, row.w = indiv_acm2_poids$poidsi)
+res <- MCA(indiv_acm2, quali.sup = 4:13, quanti.sup = 14:16, row.w = indiv_acm2_poids$poidsi)
 
 ```
 
@@ -92,7 +92,7 @@ Afrique sahélienne ou autres pays d'Afrique
 
 ```{r, include=FALSE}
 names(res.HCPC$data.clust) #15
-clust <- res.HCPC$data.clust[,15] # on ne conserve que la colonne contenant les classes
+clust <- res.HCPC$data.clust[,17] # on ne conserve que la colonne contenant les classes
 
 acm2_classe <- cbind(indiv_acm2_poids, clust)
 ```
@@ -103,11 +103,14 @@ xtable(table(acm2_classe$clust))
 
 
 ```{r, fig.height=12, echo = FALSE}
+acm2_classe$f_dip <- as.factor(acm2_classe$f_dip)
+acm2_classe$x_moifr <- as.factor(acm2_classe$x_moifr)
+
 library(GGally)
 ggtable(
   acm2_classe, 
   columnsX = "clust", 
-  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","origine_tous_g2_rec", "qpv_i_rec", "l_quart_secu_rec", "csnq_ego_rec", "l_immi_rec", "sexee_rec", "durar2", "agenq"),
+  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","origine_tous_g2_rec", "qpv_i_rec", "l_quart_secu_rec", "csnq_ego_rec", "l_immi_rec", "sexee_rec", "durar2", "agenq", "f_dip", "x_moifr"),
   mapping = aes(weight = poidsi),
   cells = "col.prop",
   fill = "std.resid",
@@ -146,7 +149,7 @@ res1.HCPC<-HCPC(res1,nb.clust=6,kk=100,consol=FALSE,graph=FALSE)
 ```
 
 ```{r, echo = FALSE}
-barplot(res1.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
+barplot(res.HCPC$call$t$inert.gain[1:20],main="Gain d'inertie intraclasse sur les 20 dernières agrégations ",
         col="lightblue",border = "grey", axes = TRUE) #+ geom_vline(xintercept = factor(c(5, 7, 10, 14, 15)), linetype = "dashed", color = "black")
 ```
 
@@ -155,6 +158,14 @@ plot.HCPC(res1.HCPC,choice='tree',title='Arbre hiérarchique')
 plot.HCPC(res1.HCPC,choice='map',draw.tree=FALSE,title='Plan factoriel')
 plot.HCPC(res1.HCPC,choice='3D.map',ind.names=FALSE,centers.plot=FALSE,angle=60,title='Arbre hiérarchique sur le plan factoriel')
 ```
+
+```{r}
+fviz_cluster(res.HCPC, addEllipses = TRUE, ellipse.type = "norm")
+```
+
+
+
+
 ```{r,include=FALSE}
 clust_6 <- res1.HCPC$data.clust[,17] 
 acm1_classe <- cbind(indiv_acm1_poids, clust_6) 
