@@ -1177,6 +1177,9 @@ ggplot(tb2, aes(x = group1_code, y= Freq, fill = d_lieudisagr_d_rec)) +
 ```
 
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 ## Confiance en la police
 
 La variable d'intérêt est i_cnfpol : Avez-vous confiance dans les

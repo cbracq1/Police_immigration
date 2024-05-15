@@ -324,14 +324,6 @@ Nous constatons étonnament que les Random Forest sur les métropolitains et les
 
 ## Arbre de décision visuel
 
-```{r}
-#Traitement
-
-#traitement = which(base$x_moifr < 8 & f_dis_flag > -1 & base$pcs_menage != "NSP/Refus/Incodable" & base$x_moifr < 8 & base$x_apparf < 8 & base$p_statsoc < 98 & base$a_avis < 8 & base$dipdet < 99 & base$compor_discri != "Refus ou ne sait pas")
-
-
-
-```
 
 ```{r}
 
@@ -375,7 +367,7 @@ indiv_tree <- indiv_tree %>% select(-c("compor_discri","l_quart_secu_rec","i_con
 
 
 ```{r}
-#indiv_tree=indiv_arbre
+indiv_tree=indiv_arbre
 
 ```
 
