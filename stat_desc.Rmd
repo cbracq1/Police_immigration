@@ -231,6 +231,15 @@ Concernant les descendants, l'âge et légèrement positivement corrélé avec l
 
 Enfin pour les métropolitains, l'âge semble indépendant de la confiance en la police.
 
+```{r}
+data = indiv_pd[which(indiv_pd$variables$group1_code == "G1_I" & indiv_pd$variable$agenq < 45)]
+
+x=20:45
+y=dfinal["G1_I_Y"][20:45,]
+cor.test(x,y,method="pearson")
+
+```
+
 
 ```{r}
 
@@ -421,6 +430,7 @@ Nous observons pour les immigrés que la confiance en la police réduit avec la 
 
 ```{r}
 limit = 60
+X = 1:limit
 
 coloration = c("red","orange","green","blue")
 
@@ -1178,7 +1188,10 @@ ggplot(tb2, aes(x = group1_code, y= Freq, fill = d_lieudisagr_d_rec)) +
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # Fin de ce qui est présenté dans le mémoire # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 
 ## Confiance en la police
 

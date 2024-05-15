@@ -49,7 +49,9 @@ indiv <- indiv %>% filter(i_cnfpol < 8 & i_contri < 8 & l_quart_secu < 8 & l_imm
 
 indiv <- indiv %>% drop_na(d_lieudisagr_d_rec)
 
+```
 
+```{r}
 #On s'occupe des durar
 
 durar = indiv$durar2
@@ -367,6 +369,31 @@ indiv_tree <- indiv_tree %>% select(-c("compor_discri","l_quart_secu_rec","i_con
 
 
 ```{r}
+#Pour des arbres plus lisibles
+
+{
+indiv_arbre = indiv_tree
+
+indiv_arbre["Nbre de lieux discrimiants"] = indiv_tree$d_lieudisagr_nbval
+indiv_arbre["fouille de la police"] = indiv_tree$i_control_rec_d
+indiv_arbre["provoc/insulte de la police"] = indiv_tree$i_control_rec_e
+indiv_arbre["discri à l'école"] = indiv_tree$f_dis_flag
+indiv_arbre["durée de séjour"] = indiv_tree$durar2
+indiv_arbre["opinion niv de vie"] = indiv_tree$a_avis
+indiv_arbre["age"]=indiv_tree$agenq
+indiv_arbre["opinion statut social"]=indiv_tree$p_statsoc
+
+indiv_arbre["sentiment français"] = indiv_tree$x_apparf
+indiv_arbre["diplôme"] = indiv_tree$dipdet
+
+indiv_arbre["chez moi en France"] = indiv_tree$x_moifr
+
+indiv_arbre <- indiv_arbre %>% select(-c("d_lieudisagr_nbval","i_control_rec_d","i_control_rec_e",
+                                         "f_dis_flag","durar2","a_avis","agenq",
+                                         "p_statsoc","x_apparf","dipdet","x_moifr"))
+
+}
+
 indiv_tree=indiv_arbre
 
 ```
@@ -445,11 +472,12 @@ indiv_tree_i = indiv_tree[c(i_immig),]
 data_tree = select(indiv_tree_i,-one_of("ident","poidsi","i_cnfpol_1"))
 target_tree = indiv_tree_i$i_cnfpol_1
 
-fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree_i$poidsi, control = rpart.control(cp = 0.005))
+fitree <- rpart(target_tree~., data = data_tree, method = 'class', weights = indiv_tree_i$poidsi, control = rpart.control(cp = 0.002))
 
 
 visTree(fitree)
 ```
+
 ```{r}
 dpr_tree = data.frame(predict(fitree,data_tree))
 
