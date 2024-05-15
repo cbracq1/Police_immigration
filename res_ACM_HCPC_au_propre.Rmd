@@ -103,11 +103,14 @@ xtable(table(acm2_classe$clust))
 
 
 ```{r, fig.height=12, echo = FALSE}
+acm2_classe$f_dip <- as.factor(acm2_classe$f_dip)
+acm2_classe$x_moifr <- as.factor(acm2_classe$x_moifr)
+
 library(GGally)
 ggtable(
   acm2_classe, 
   columnsX = "clust", 
-  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","origine_tous_g2_rec", "qpv_i_rec", "l_quart_secu_rec", "csnq_ego_rec", "l_immi_rec", "sexee_rec", "durar2", "agenq"),
+  columnsY = c("i_cnfpol_rec", "i_contri_rec", "d_lieudisagr_d_rec", "compor_discri","origine_tous_g2_rec", "qpv_i_rec", "l_quart_secu_rec", "csnq_ego_rec", "l_immi_rec", "sexee_rec", "durar2", "agenq", "f_dip", "x_moifr"),
   mapping = aes(weight = poidsi),
   cells = "col.prop",
   fill = "std.resid",
