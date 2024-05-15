@@ -29,6 +29,7 @@ library(survey)
 library(arrow)
 library(ggplot2)
 library(questionr)
+library(corrplot)
 ```
 
 ```{r base, include = FALSE}
@@ -506,9 +507,6 @@ ggplot(tb2, aes(x = taux_confiance, y= Freq, fill = origine_tous_g2_code)) +
 
 
 ```
-```{r} 
-tb2
-```
 
 
 Nous remarquons que parmi les personnes qui n'ont pas confiance en la police il y a :
@@ -859,6 +857,32 @@ ggplot(tb2, aes(x = l_immi_rec, y= Freq, fill = l_quart_secu_rec)) +
 
 
 ```
+
+```{r}
+#Matrice de correlation i_contri x l_immi x rquart_secu x i_cnfpol
+
+dmat = data.frame(indiv_pd$variables$i_cnfpol,indiv_pd$variables$i_contri,indiv_pd$variables$l_immi,indiv_pd$variables$l_quart_secu)
+
+dmat["Confiance en la police"]=dmat$indiv_pd.variables.i_cnfpol
+dmat["Présence d'immigrés"] = dmat$indiv_pd.variables.l_immi
+dmat["Sécurité dans le quartier"]=dmat$indiv_pd.variables.l_quart_secu
+
+dmat <- dmat %>% 
+  mutate(Fréquence_des_Contrôles = 
+           case_when(indiv_pd.variables.i_contri == 1 ~ 4,
+                     indiv_pd.variables.i_contri == 2 ~ 3,
+                     indiv_pd.variables.i_contri == 3 ~ 2,
+                     indiv_pd.variables.i_contri == 4 ~ 1))
+  
+dmat["Fréquence des contrôles"] = dmat$Fréquence_des_Contrôles
+
+dmat <- dmat %>% select(c("Confiance en la police","Fréquence des contrôles","Sécurité dans le quartier","Présence d'immigrés"))
+
+install.packages("ggcorrplot")
+library(ggcorrplot)
+corrplot(cor(dmat),method="number")
+```
+
 
 
 ```{r}
